@@ -19,7 +19,7 @@ $ vagrant up
 
 ## Run django on your local machine
 
- `$ cd ~/root/dev/microns_project`
- `$ python manage.py runserver '0.0.0.0:8000'`
+ `$ cd ~/root/dev/microns_project`  
+ `$ python manage.py runserver '0.0.0.0:8000'`  
 
   visit `http://localhost:8080`

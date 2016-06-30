@@ -1,7 +1,7 @@
 This spins up a Vagrant instance of a Microns development VM.
 
 ## Install
-
+Clone [this repo](https://github.com/WyssMICrONS/api-server) and `cd` into it.  
 Download and install [Vagrant](https://www.vagrantup.com/downloads.html)  
  `$ vagrant init centos/7`  
  `$ vagrant plugin install vagrant-vbguest`  

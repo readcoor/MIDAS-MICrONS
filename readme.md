@@ -23,4 +23,5 @@ $ `vagrant up`
  `$ cd ~/sync/microns_project`  
  `$ python manage.py runserver '0.0.0.0:8000'`  
 
-  visit `http://localhost:8080`
+  visit `http://localhost:8080`  
+  visit [API browser](http://localhost:8080/docs/), written with [swagger](http://swagger.io/)  

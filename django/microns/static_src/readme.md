@@ -8,4 +8,4 @@ After modifying this directory, be sure to run this command:
 
 `$ python manage.py collectstatic`  
 
-This will find and copy all static files into ../static, so that beanstalk can serve them.
+This will find and copy all static files into `../static`, so that beanstalk can serve them.

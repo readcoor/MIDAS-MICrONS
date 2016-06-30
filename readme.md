@@ -32,8 +32,8 @@ $ `vagrant up`
   `$ python manage.py test`  
 
 ## Configure your vagrant VM with your AWS ElasticBeanstalk client
-  [Deploying Django on Beanstalk](http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html)
-  Configure your [API credentials](https://console.aws.amazon.com/iam/home#users) 
+  [Deploying Django on Beanstalk](http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html)  
+  Configure your [API credentials](https://console.aws.amazon.com/iam/home#users)  
  `$ eb init -p python2.7 api`  
  `$ eb init`  
   

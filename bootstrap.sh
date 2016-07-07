@@ -23,3 +23,5 @@ pip install virtualenv
 pip install awsebcli
 pip install django
 pip install django-rest-swagger
+pip install markdown
+

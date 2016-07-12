@@ -6,6 +6,7 @@ django-rest-swagger==0.3.8
 djangorestframework==3.3.3
 docutils==0.12
 pathspec==0.3.4
+psycopg2==2.6.2
 PyYAML==3.11
 requests==2.9.1
 six==1.10.0

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script provisions a blank CentOS box for Microns
+# This script provisions a blank CentOS 7 box for Microns
 ln -s /vagrant /home/vagrant/sync
 
 # updates CentOS
@@ -28,5 +28,3 @@ pip install django
 pip install django-rest-swagger
 pip install markdown
 pip install psycopg2
-
-

@@ -28,3 +28,5 @@ pip install django
 pip install django-rest-swagger
 pip install markdown
 pip install psycopg2
+pip install numpy
+pip install blosc

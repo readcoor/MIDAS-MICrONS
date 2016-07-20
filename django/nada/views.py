@@ -1,17 +1,21 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .models import Neuron, Synapse
 
+        
 # S1
 @api_view(['GET'])
 def is_synapse(request, collection=None, experiment=None, layer=None, id=None):
-    result = { "result": True }
+    synapse = Synapse.get_by_celi(collection, experiment, layer, id)
+    result = { "result": not (synapse == None) }
     return Response(result, status=status.HTTP_200_OK)
 
 # S5
 @api_view(['GET'])
 def is_neuron(request, collection=None, experiment=None, layer=None, id=None):
-    result = { "result": True }
+    neuron = Neuron.get_by_celi(collection, experiment, layer, id)
+    result = { "result": not (neuron == None) }
     return Response(result, status=status.HTTP_200_OK)
 
 

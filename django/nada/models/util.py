@@ -2,7 +2,7 @@ from django.db import models
 import inspect
 from enum import Enum
 
-class NameLookupModel(models.Model):
+class NameLookupMixin:
     @classmethod
     def get_by_name(cls, name):
         '''
@@ -12,8 +12,8 @@ class NameLookupModel(models.Model):
         '''
         return cls.objects.filter(name=name).get()
 
-    class Meta:
-        abstract = True
+    def __repr__(self):
+        return '<%s %s>' % (self.__class__.__name__, self.name)
 
 
 class ChoiceEnum(Enum):

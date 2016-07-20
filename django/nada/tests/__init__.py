@@ -1,1 +1,1 @@
-import test_objs
+from . import test_objs

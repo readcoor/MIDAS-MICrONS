@@ -14,14 +14,14 @@
 # limitations under the License.
 
 from django.db import models
-from .util import NameLookupModel
+from .util import NameLookupMixin
 from . import validators
 
 
 __all__ = ['Collection', 'Experiment', 'CoordinateFrame', 'Layer']
 
 
-class Collection(NameLookupModel):
+class Collection(NameLookupMixin, models.Model):
     """
     Object representing a Boss Collection
     """
@@ -33,7 +33,7 @@ class Collection(NameLookupModel):
         return self.name
 
 
-class Experiment(NameLookupModel):
+class Experiment(NameLookupMixin, models.Model):
     """
     Object representing a BOSS experiment
     """
@@ -59,7 +59,7 @@ class Experiment(NameLookupModel):
         return self.name
 
 
-class CoordinateFrame(NameLookupModel):
+class CoordinateFrame(NameLookupMixin, models.Model):
     """
     Coordinate Frame for Boss Experiments
 
@@ -100,7 +100,7 @@ class CoordinateFrame(NameLookupModel):
 
 
 
-class Layer(NameLookupModel):
+class Layer(NameLookupMixin, models.Model):
     """
     Object representing a channel or layer. For image datasets these are channels and for annotations datasets these
     are layers.
@@ -126,4 +126,3 @@ class Layer(NameLookupModel):
 
     def __str__(self):
         return self.name
-

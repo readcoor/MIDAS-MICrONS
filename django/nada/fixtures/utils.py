@@ -1,4 +1,4 @@
-
+__all__ = ['nuke_all', 'is_empty']
 
 def nuke_all(classes):
     'Destroys all objects'

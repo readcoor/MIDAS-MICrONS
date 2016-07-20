@@ -1,14 +1,14 @@
-import json
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
 import nada.models
 import nada.fixtures
+import unittest
 
 class FixturesTestCase(APITestCase):
-
+    
     def setUp(self):
-        self.assertTrue(nada.fixtures.is_empty())
+        self.assertTrue(nada.fixtures.is_empty(nada.fixtures.BOSS_CLASSES))
         nada.fixtures.boss.setup()
         
     def test_fixtures(self):
@@ -20,6 +20,7 @@ class FixturesTestCase(APITestCase):
             self.assertEquals(found, count, 'Expected %s instances of %s, but found %s' % (count, cls, found))
 
 
+    @unittest.skip("theboss views disabled for now")
     def test_api_get_experiment(self):
         url = reverse('experiment-detail', args=['collection1', 'experiment1'])
         self.assertEquals(url, '/v1/resource/experiment/collection1/experiment1')
@@ -27,6 +28,7 @@ class FixturesTestCase(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(response.data.get('name', None), 'experiment1')
 
+    @unittest.skip("theboss views disabled for now")
     def test_api_get_layer(self):
         url = reverse('layer-detail', args=['collection1', 'experiment2', 'layer4'])
         self.assertEquals(url, '/v1/resource/layer/collection1/experiment2/layer4')
@@ -35,6 +37,6 @@ class FixturesTestCase(APITestCase):
         self.assertEquals(response.data.get('name', None), 'layer4')
 
     def tearDown(self):
-        nada.fixtures.nuke_all()
-        self.assertTrue(nada.fixtures.is_empty())
+        nada.fixtures.nuke_all(nada.fixtures.BOSS_CLASSES)
+        self.assertTrue(nada.fixtures.is_empty(nada.fixtures.BOSS_CLASSES))
 

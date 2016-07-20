@@ -21,7 +21,7 @@ $ `vagrant up`
  `$ vagrant ssh`  
  Run these commands on your vagrant VM:  
  `$ cd ~/sync/django`  
- `$ python manage.py runserver '0.0.0.0:8000'`  
+ `$ python3 manage.py runserver '0.0.0.0:8000'`  
 
   visit `http://localhost:8080`  
   visit [API browser](http://localhost:8080/docs/), written with [swagger](http://swagger.io/)  
@@ -29,12 +29,11 @@ $ `vagrant up`
 ## Testing
   Run django on your local machine, then run these steps:  
   `$ cd ~/sync/django/`  
-  `$ python manage.py test`  
+  `$ python3 manage.py test`  
 
 ## Configure your vagrant VM with your AWS ElasticBeanstalk client
   [Deploying Django on Beanstalk](http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html)  
   Configure your [API credentials](https://console.aws.amazon.com/iam/home#users)  
- `$ eb init -p python2.7 api`  
  `$ eb init`  
   
 
@@ -43,4 +42,4 @@ $ `vagrant up`
   `$ eb ssh`  
   Then manage django with this:  
   `$ source /opt/python/current/env`  
-  `$ /opt/python/run/venv/bin/python /opt/python/current/app/manage.py <command>`
+  `$ /opt/python/run/venv/bin/python3 /opt/python/current/app/manage.py <command>`

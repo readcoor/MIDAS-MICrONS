@@ -17,13 +17,19 @@ from microns.settings import API_VERSION
 from django.conf.urls import include, url, patterns
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.views.generic.base import RedirectView
 
 from django.views.generic import TemplateView
+from .views import schema_view
+
+favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="index.html")),
+    url(r'^favicon\.ico$', favicon_view),
     url(r'^admin/', admin.site.urls),
-    url(r'^docs/', include('rest_framework_swagger.urls')),
-    url('^%s/resource/' % API_VERSION, include('nada.urls'))
+    #url(r'^docs/', include('rest_framework_swagger.urls')),
+    url(r'^docs/', schema_view),
+    url('^', include('nada.urls'))
     ]
 

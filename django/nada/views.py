@@ -1,134 +1,75 @@
-import yaml
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-from models import *
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-def add_yaml(string, obj):
-    return '%s\n---\n%s' % (string, yaml.dump(obj))
-    #return string
+# S1
+@api_view(['GET'])
+def is_synapse(request, collection=None, experiment=None, layer=None, id=None):
+    result = { "result": True }
+    return Response(result, status=status.HTTP_200_OK)
 
-# POST /collection/
-class CollectionPostViewSet(viewsets.ModelViewSet):
-    '''Create a new collection'''
-    queryset = Collection.objects.all()
-    serializer_class = CollectionSerializer
-
-# GET /collections/
-class CollectionsViewSet(viewsets.ModelViewSet):
-    '''List all collections'''
-    queryset = Collection.objects.all()
-    serializer_class = CollectionSerializer
-
-# [GET,PUT,DELETE] /collection/:name/
-class CollectionViewSet(viewsets.ModelViewSet):
-    '''Get a collection's details'''
-    queryset = Collection.objects.all()
-    serializer_class = CollectionSerializer
-    lookup_field = 'name'
-    docstrings = [('retrieve', 'Retrieve a collection'),
-                  ('update', add_yaml('Update a collection', 
-                                      {'parameters':[{'name':'name','paramType':'path'}]})),
-                  ('destroy', 'Delete a collection')]
+# S5
+@api_view(['GET'])
+def is_neuron(request, collection=None, experiment=None, layer=None, id=None):
+    result = { "result": True }
+    return Response(result, status=status.HTTP_200_OK)
 
 
+# S2
+@api_view(['GET'])
+def synapse_ids(request, collection=None, experiment=None, layer=None, resolution=None,
+                           x_start=None, x_stop=None,
+                           y_start=None, y_stop=None,
+                           z_start=None, z_stop=None
+                           ):
+    result = { "ids": ['123', '456', '999'] }
+    return Response(result, status=status.HTTP_200_OK)
 
-# POST /coordinateframe/
-class CoordinateFramePostViewSet(viewsets.ModelViewSet):
-    '''Create a new coordinateframe'''
-    queryset = CoordinateFrame.objects.all()
-    serializer_class = CoordinateFrameSerializer
+# S6
+@api_view(['GET'])
+def neuron_ids(request, collection=None, experiment=None, layer=None, resolution=None,
+                           x_start=None, x_stop=None,
+                           y_start=None, y_stop=None,
+                           z_start=None, z_stop=None
+                           ):
+    result = { "ids": ['123', '456', '999'] }
+    return Response(result, status=status.HTTP_200_OK)
 
-# GET /coordinateframes/
-class CoordinateFramesViewSet(viewsets.ModelViewSet):
-    '''List all coordinateframes'''
-    queryset = CoordinateFrame.objects.all()
-    serializer_class = CoordinateFrameSerializer
+# S3 
+@api_view(['GET'])
+def synapse_keypoint(request, collection=None, experiment=None, layer=None, resolution=None, id=None):
+    result = { "keypoint": [10, 10, 10] }
+    return Response(result, status=status.HTTP_200_OK)
 
-# [GET,PUT,DELETE] /coordinateframe/:name/
-class CoordinateFrameViewSet(viewsets.ModelViewSet):
-    '''Get a coordinateframe's details'''
-    queryset = CoordinateFrame.objects.all()
-    serializer_class = CoordinateFrameSerializer
-    lookup_field = 'name'
-    docstrings = [('retrieve', 'Retrieve a coordinateframe'),
-                  ('update', add_yaml('Update a coordinateframe', 
-                                      {'parameters':[{'name':'name','paramType':'path'}]})),
-                  ('destroy', 'Delete a coordinateframe')]
+# S7
+@api_view(['GET'])
+def neuron_keypoint(request, collection=None, experiment=None, layer=None, resolution=None, id=None):
+    result = { "keypoint": [10, 10, 10] }
+    return Response(result, status=status.HTTP_200_OK)
 
+# S4
+@api_view(['GET'])
+def synapse_parent(request, collection=None, experiment=None, layer=None, id=None):
+    result = { "parent_neurons": { '12345': 1, '34567': 2 } }
+    return Response(result, status=status.HTTP_200_OK)
 
-# POST /experiment/
-class ExperimentPostViewSet(viewsets.ModelViewSet):
-    '''Create a new experiment'''
-    queryset = Experiment.objects.all()
-    serializer_class = ExperimentSerializer
-
-# GET /coordinateframes/
-class ExperimentsViewSet(viewsets.ModelViewSet):
-    '''List all experiments'''
-    queryset = Experiment.objects.all()
-    serializer_class = ExperimentSerializer
-
-# [GET,PUT,DELETE] /experiment/:collection/:name/
-class ExperimentViewSet(viewsets.ModelViewSet):
-    '''Get an experiment's details'''
-    queryset = Experiment.objects.all()
-    serializer_class = ExperimentSerializer
-    lookup_field = ['name']
-    #multiple_lookup_fields = ['collection', 'name']
-    docstrings = [('retrieve', 'Retrieve an experiment'),
-                  ('update', add_yaml('Update an experiment', 
-                                      {'parameters':[{'name':'name','paramType':'path'}]})),
-                  ('destroy', 'Delete an experiment')]
-
-    
-    def get_object(self):
-        col_name = self.kwargs['collection']
-        exp_name = self.kwargs['name']
-        objects = self.get_queryset().filter(collection__name=col_name).filter(name=exp_name)
-        obj = get_object_or_404(objects)
-        self.check_object_permissions(self.request, obj)
-        return obj
-
-def init_docstrings(cls):
-    for (fcn, string) in cls.docstrings:
-        getattr(cls, fcn).__func__.__doc__ = string
+# S8
+@api_view(['GET'])
+def neuron_children(request, collection=None, experiment=None, layer=None,  resolution=None,
+                        x_start=None, x_stop=None,
+                        y_start=None, y_stop=None,
+                        z_start=None, z_stop=None, id=None):
+    result = { "child_synapses": { '12345': 1, '34567': 2 } }
+    return Response(result, status=status.HTTP_200_OK)
 
 
-# POST /layer/
-class LayerPostViewSet(viewsets.ModelViewSet):
-    '''Create a new layer'''
-    queryset = Layer.objects.all()
-    serializer_class = LayerSerializer
-
-# GET /layer/
-class LayersViewSet(viewsets.ModelViewSet):
-    '''List all layers'''
-    queryset = Layer.objects.all()
-    serializer_class = LayerSerializer
-
-# [GET,PUT,DELETE] /layer/:collection/:experiment/:name/
-class LayerViewSet(viewsets.ModelViewSet):
-    '''Get an layer's details'''
-    queryset = Layer.objects.all()
-    serializer_class = LayerSerializer
-    lookup_field = ['name']
-    #multiple_lookup_fields = ['collection', 'name']
-    docstrings = [('retrieve', 'Retrieve a layer'),
-                  ('update', add_yaml('Update a layer', 
-                                      {'parameters':[{'name':'name','paramType':'path'}]})),
-                  ('destroy', 'Delete a layer')]
-    
-    def get_object(self):
-        col_name = self.kwargs['collection']
-        exp_name = self.kwargs['experiment']
-        layer_name = self.kwargs['name']
-        objects = self.get_queryset().filter(experiment__collection__name=col_name).filter(experiment__name=exp_name).filter(name=layer_name)
-        obj = get_object_or_404(objects)
-        self.check_object_permissions(self.request, obj)
-        return obj
-
-
-init_docstrings(CollectionViewSet)
-init_docstrings(CoordinateFrameViewSet)
-init_docstrings(ExperimentViewSet)
-init_docstrings(LayerViewSet)
+# S9
+@api_view(['GET'])
+def voxel_list(request, collection=None, experiment=None, layer=None,  resolution=None,
+                        x_start=None, x_stop=None,
+                        y_start=None, y_stop=None,
+                        z_start=None, z_stop=None, id=None):
+    result = { "x": [0, 0, 0, 1, 1, 1],
+               "y": [1, 0, 1, 0, 1, 0],
+               "z": [1, 2, 3, 1, 2, 3] }
+    return Response(result, status=status.HTTP_200_OK)

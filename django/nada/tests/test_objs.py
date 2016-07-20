@@ -9,7 +9,7 @@ class FixturesTestCase(APITestCase):
 
     def setUp(self):
         self.assertTrue(nada.fixtures.is_empty())
-        nada.fixtures.setup()
+        nada.fixtures.boss.setup()
         
     def test_fixtures(self):
         for (cls, count) in [(nada.models.Collection, 1),

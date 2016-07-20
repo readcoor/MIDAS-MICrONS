@@ -14,23 +14,11 @@
 # limitations under the License.
 
 from django.db import models
+from .util import NameLookupModel
 from . import validators
 
 
 __all__ = ['Collection', 'Experiment', 'CoordinateFrame', 'Layer']
-
-class NameLookupModel(models.Model):
-    @classmethod
-    def get_by_name(cls, name):
-        '''
-        Raises:
-          MultipleObjectsReturned: If more than one object found with given name
-          cls.DoesNotExist:        If no object found
-        '''
-        return cls.objects.filter(name=name).get()
-
-    class Meta:
-        abstract = True
 
 
 class Collection(NameLookupModel):

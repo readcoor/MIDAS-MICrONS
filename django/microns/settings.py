@@ -80,19 +80,33 @@ WSGI_APPLICATION = 'microns.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'sqlite': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
+# Use sqlite on dev machine. Use postgres for production
+if 'DJANGO_DEV' in os.environ:
+    #DATABASES['default'] = DATABASES['sqlite'].copy()
+    DATABASES['default'] = {
+        #'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'microns',
+        'USER': 'tester',
+        'PASSWORD': 'test_password',
+        'HOST': 'localhost',
+        'PORT': ''}
+else:
+    DATABASES['default'] = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ['RDS_DB_NAME'],
         'USER': os.environ['RDS_USERNAME'],
         'PASSWORD': os.environ['RDS_PASSWORD'],
         'HOST': os.environ['RDS_HOSTNAME'],
         'PORT': os.environ['RDS_PORT'],
-    },
-    'sqlite': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-}
+    
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators

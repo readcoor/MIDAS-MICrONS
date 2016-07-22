@@ -2,14 +2,16 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
 import nada.models
-import nada.fixtures
+from nada.fixtures import is_empty, nuke_all, boss_setup, neurons_setup, BOSS_CLASSES, NEURONS_CLASSES, NEURONS_TEST_OPTIONS
 import unittest
 
 class FixturesTestCase(APITestCase):
     
     def setUp(self):
-        self.assertTrue(nada.fixtures.is_empty(nada.fixtures.BOSS_CLASSES))
-        nada.fixtures.boss.setup()
+        self.assertTrue(is_empty(BOSS_CLASSES))
+        self.assertTrue(is_empty(BOSS_CLASSES))
+        boss_setup()
+        neurons_setup(**NEURONS_TEST_OPTIONS)
         
     def test_fixtures(self):
         for (cls, count) in [(nada.models.Collection, 1),
@@ -36,7 +38,24 @@ class FixturesTestCase(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(response.data.get('name', None), 'layer4')
 
+
+    def test_neuron_connections(self):
+        for neuron in nada.models.Neuron.objects.all():
+            self.assertIsNotNone(neuron.experiment)
+            self.assertIsNotNone(neuron.layer)
+
+    def test_synapse_connections(self):
+        for synapse in nada.models.Synapse.objects.all():
+            self.assertIsNotNone(synapse.experiment)
+            self.assertIsNotNone(synapse.layer)
+            self.assertIsNotNone(synapse.neuron)
+            self.assertIn(synapse, synapse.neuron.synapses.all())
+            self.assertEquals(synapse, synapse.partner_synapse.partner_synapse)
+            self.assertEquals(synapse.neuron, synapse.partner_synapse.partner_neuron)
+
     def tearDown(self):
-        nada.fixtures.nuke_all(nada.fixtures.BOSS_CLASSES)
-        self.assertTrue(nada.fixtures.is_empty(nada.fixtures.BOSS_CLASSES))
+        nuke_all(NEURONS_CLASSES)
+        self.assertTrue(is_empty(NEURONS_CLASSES))
+        nuke_all(BOSS_CLASSES)
+        self.assertTrue(is_empty(BOSS_CLASSES))
 

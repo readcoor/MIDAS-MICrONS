@@ -1,8 +1,8 @@
 from ..models import Layer, Experiment, CoordinateFrame, Collection
 
-CLASSES = [Layer, Experiment, CoordinateFrame, Collection]
+BOSS_CLASSES = [Layer, Experiment, CoordinateFrame, Collection]
 
-def setup():
+def boss_setup():
     '''Sets up some sample objects for testing and debugging'''
     collection1 = Collection(name='collection1')
     collection1.save()

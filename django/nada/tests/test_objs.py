@@ -43,12 +43,14 @@ class FixturesTestCase(APITestCase):
         for neuron in nada.models.Neuron.objects.all():
             self.assertIsNotNone(neuron.experiment)
             self.assertIsNotNone(neuron.layer)
+            self.assertEquals(neuron.layer.name, 'layer1')
 
     def test_synapse_connections(self):
         for synapse in nada.models.Synapse.objects.all():
             self.assertIsNotNone(synapse.experiment)
             self.assertIsNotNone(synapse.layer)
             self.assertIsNotNone(synapse.neuron)
+            self.assertEquals(synapse.layer.name, 'layer2')
             self.assertIn(synapse, synapse.neuron.synapses.all())
             self.assertEquals(synapse, synapse.partner_synapse.partner_synapse)
             self.assertEquals(synapse.neuron, synapse.partner_synapse.partner_neuron)
@@ -58,4 +60,3 @@ class FixturesTestCase(APITestCase):
         self.assertTrue(is_empty(NEURONS_CLASSES))
         nuke_all(BOSS_CLASSES)
         self.assertTrue(is_empty(BOSS_CLASSES))
-

@@ -4,7 +4,7 @@ from .samples import Experiment, Layer
 from django.contrib.gis.db import models as gis_models
 from django.shortcuts import get_object_or_404
 
-__all__ = ['Neuron', 'Synapse']
+__all__ = ['Neuron', 'Synapse', 'Polarity']
 
 class Polarity(ChoiceEnum):
     "Allowed synapse polarity values (Enum)"
@@ -36,6 +36,24 @@ class CELIMixin:
                .filter(name=id) \
                .first()
 
+class IdsInVolumeMixin:
+    """
+    Looks up an object (neuron or synapse) matching the given collection/experiment/layer within a
+    given volume.
+    Returns None if none found.
+    """
+    
+    @classmethod
+    def get_ids_in_volume(cls, collection_name, experiment_name, layer_name, x_start, x_stop, y_start, y_stop, z_start, z_stop):
+        query = cls.objects \
+               .filter(experiment__collection__name=collection_name) \
+               .filter(experiment__name=experiment_name) \
+               .filter(layer__name=layer_name)
+        volume = foo()
+        in_volume = query.filter(poly__contains=geom)
+
+
+
 class Neuron(NameLookupMixin, CELIMixin, models.Model):
     """
     Object representing a Neuron
@@ -43,7 +61,7 @@ class Neuron(NameLookupMixin, CELIMixin, models.Model):
     name = models.BigIntegerField(unique=True)
     experiment = models.ForeignKey(Experiment, related_name='neurons', on_delete=models.PROTECT) # Parent
     layer = models.ForeignKey(Layer, related_name='neurons', on_delete=models.PROTECT) # Parent
-    cell_type = models.CharField(max_length=1, choices=CellType.choices())
+    cell_type = models.IntegerField(choices=CellType.choices(), default=CellType.unknown.value)
     geometry = gis_models.MultiPointField(dim=3) # [Point(x,y,z)...]
     keypoint = gis_models.PointField(dim=3) # Point(x,y,z)
     # activity - TBD
@@ -69,7 +87,7 @@ class Synapse(NameLookupMixin, CELIMixin, models.Model):
                                            on_delete=models.CASCADE)
     geometry = gis_models.MultiPointField(dim=3)   # [ GISPoint(x,y,z), ... ]
     keypoint = gis_models.PointField(dim=3)        # GISPoint(x,y,z)
-    polarity = models.CharField(max_length=1, choices=Polarity.choices())
+    polarity = models.IntegerField(choices=Polarity.choices(), default=Polarity.unknown.value)
     compartment = models.FloatField()
 
 

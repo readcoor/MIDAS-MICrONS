@@ -27,8 +27,19 @@ host    all  all ::1/128  ident
 
 Change `peer` or `ident` -> `trust`
 
+Add line to listen to 10.* subnet:
+`host    all    all    10.0.0.0/16   trust`
+
 ~~~~bash
 $ sudo emacs /var/lib/pgsql/9.4/data/pg_hba.conf  
+$ sudo service postgresql-9.4 restart
+~~~~
+
+Add address to listen to:  
+`listen_addresses = '0.0.0.0'`
+
+~~~~bash
+$ sudo emacs /var/lib/pgsql/9.4/data/postgresql.conf
 $ sudo service postgresql-9.4 restart
 ~~~~
 

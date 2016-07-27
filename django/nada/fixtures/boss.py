@@ -20,8 +20,8 @@ def boss_setup():
     experiment2 = Experiment(name='experiment2', collection=collection1, coord_frame=coord1)
     experiment2.save()
     layer_params = {'default_time_step':0, 'base_resolution':0, 'datatype':'uint64'}
-    layer1 = Layer(name='layer1', experiment=experiment1, is_channel=False, **layer_params)
-    layer2 = Layer(name='layer2', experiment=experiment1, is_channel=False, **layer_params)
+    layer1 = Layer(name='layer1', experiment=experiment1, is_channel=False, description="Neurons layer",  **layer_params)
+    layer2 = Layer(name='layer2', experiment=experiment1, is_channel=False, description="Synapses layer", **layer_params)
     layer3 = Layer(name='layer3', experiment=experiment1, is_channel=False, **layer_params)
     layer4 = Layer(name='layer4', experiment=experiment2, is_channel=False, **layer_params)
     layer5 = Layer(name='layer5', experiment=experiment2, is_channel=False, **layer_params)

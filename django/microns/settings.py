@@ -146,3 +146,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 API_VERSION = 'v1'
+
+THEBOSS_CONFIG = os.path.join(BASE_DIR, 'theboss.cfg')

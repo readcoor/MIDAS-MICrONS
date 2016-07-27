@@ -91,24 +91,23 @@ def neurons_setup(**options):
 
 def choose_partner(synapse, others):
     '''
-    Returns a partner for synapse.
+    Returns a partner (another synapse) for a synapse.
     Others = a list of available unassigned synapses.
     Guarantees that synapse and the partner do not both belong to the same neuron.
     '''
     options = others.copy()
-    while len(options)>0:
-        try:
-            choice = random_other(synapse, options)
-        except:
-            # can't find another valid choice
-            break 
+    while len(options)>1 or (len(options)==1 and synapse != options[0]):
+        # while there are still valid options
+        choice = random_other(synapse, options)
         if choice.neuron == synapse.neuron:
+            # don't choose another synapse on the same neuron
             options.remove(choice)
         else:
             return choice
     # all other synapses have the same neuron, so pick a free synapse and change its neuron
     choice = random_other(synapse, others)
     neuron_id = synapse.neuron.name
+    # reassign the chosen synapse's neuron
     other_neurons = [n for n in Neuron.objects.exclude(name=neuron_id)]
     choice.neuron = random.choice(other_neurons)
     return choice

@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Neuron, Synapse
-
+from .boss_client import BossClient
         
 # S1
 @api_view(['GET'])
@@ -115,10 +115,24 @@ def neuron_children(request, collection=None, experiment=None, layer=None,  reso
 
 # S9
 @api_view(['GET'])
+def voxel_list_local(request, collection=None, experiment=None, layer=None,  resolution=None,
+                     x_start=None, x_stop=None,
+                     y_start=None, y_stop=None,
+                     z_start=None, z_stop=None, id=None):
+    result = { "x": [0, 0, 0, 1, 1, 1],
+               "y": [1, 0, 1, 0, 1, 0],
+               "z": [1, 2, 3, 1, 2, 3] }
+    return Response(result, status=status.HTTP_200_OK)
+
+
+# S9
+@api_view(['GET'])
 def voxel_list(request, collection=None, experiment=None, layer=None,  resolution=None,
-                        x_start=None, x_stop=None,
-                        y_start=None, y_stop=None,
-                        z_start=None, z_stop=None, id=None):
+               x_start=None, x_stop=None,
+               y_start=None, y_stop=None,
+               z_start=None, z_stop=None, id=None):
+    boss = BossClient()
+    result = boss.test(collection, experiment)
     result = { "x": [0, 0, 0, 1, 1, 1],
                "y": [1, 0, 1, 0, 1, 0],
                "z": [1, 2, 3, 1, 2, 3] }

@@ -100,7 +100,8 @@ def choose_partner(synapse, others):
         try:
             choice = random_other(synapse, options)
         except:
-            break
+            # can't find another valid choice
+            break 
         if choice.neuron == synapse.neuron:
             options.remove(choice)
         else:
@@ -113,7 +114,10 @@ def choose_partner(synapse, others):
     return choice
 
 def random_other(item, list):
-    'Returns an element of list which is not item'
+    '''
+    Returns an element of list which is not item
+    Throws an exception if list has no valid alternatives.
+    '''
     if len(list) == 0 or (len(list)==1 and item == list[0]):
         raise Exception('No alternatives to choose from')
     other = item

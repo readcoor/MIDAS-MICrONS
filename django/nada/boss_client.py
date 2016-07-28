@@ -3,8 +3,11 @@ from ndio.ndresource.boss.resource import CollectionResource, ExperimentResource
 
 from django.conf import settings
 
-#from nada.boss_client import BossClient
-#b = BossClient()
+# TheBoss connection requires a valid login token
+# provided in '../theboss.cfg'
+#
+# Generate a new token at https://api.theboss.io/token/
+
 
 class BossClient:
     def __init__(self):
@@ -39,15 +42,3 @@ class BossClient:
     def get_channel(self, channel_name, collection_name, experiment_name):
         channel = ChannelResource(channel_name, collection_name, experiment_name, version=self.api_version)
         return self.remote_get(channel)
-
-
-
-    def test(self):
-        e = ExperimentResource('experiment1', API_VERSION)
-        e.coll_name = 'collection1'
-        
-
-
-        return self.remote_get(coll)
-
-

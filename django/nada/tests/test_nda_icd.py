@@ -117,6 +117,21 @@ class NdaIcdTestCase(APITestCase):
             self.assertEquals(result[1], neuron_kp.y)
             self.assertEquals(result[2], neuron_kp.z)
 
+    def test_S8_neuron_children(self):
+        for neuron in nada.models.Neuron.objects.all():
+            neuron_id = neuron.name
+            url = reverse('neuron_children', args=['collection1', 'experiment1', 'layer1', neuron_id])
+            self.assertEquals(url, '/neuron_children/collection1/experiment1/layer1/%s' % neuron_id)
+            response = self.client.get(url, format='json')
+            self.assertEquals(response.status_code, status.HTTP_200_OK)
+            result = response.data.get('child_synapses', None)
+            self.assertIsInstance(result, dict)
+
+            for (synapse_id, polarity) in result.items():
+                synapse = nada.models.Synapse.get_by_name(int(synapse_id))
+                self.assertEquals(synapse.polarity, polarity)
+                self.assertIn(neuron.name, [synapse.partner_neuron.name, synapse.neuron.name])
+
     def tearDown(self):
         nuke_all(NEURONS_CLASSES)
         self.assertTrue(is_empty(NEURONS_CLASSES))

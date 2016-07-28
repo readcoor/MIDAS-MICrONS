@@ -1,9 +1,11 @@
+from django.contrib.gis.geos import Point
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.reverse import reverse
 import nada.models
-from nada.fixtures import is_empty, nuke_all, boss_setup, neurons_setup, BOSS_CLASSES, NEURONS_CLASSES, NEURONS_TEST_OPTIONS
-import unittest
+from nada.fixtures import is_empty, nuke_all, boss_setup, neurons_setup, \
+     BOSS_CLASSES, NEURONS_CLASSES, NEURONS_TEST_OPTIONS
+
 
 class NdaIcdTestCase(APITestCase):
     
@@ -69,6 +71,8 @@ class NdaIcdTestCase(APITestCase):
             self.assertIn(nada.models.Polarity.post.value, result.values())
 
             for (neuron_id, polarity) in result.items():
+                self.assertIsInstance(polarity, int)
+                self.assertIn(polarity, range(0,4))
                 neuron = nada.models.Neuron.get_by_name(int(neuron_id))
                 if synapse.polarity == polarity:
                     self.assertEquals(synapse.neuron.name, neuron.name)
@@ -128,13 +132,34 @@ class NdaIcdTestCase(APITestCase):
             self.assertIsInstance(result, dict)
 
             for (synapse_id, polarity) in result.items():
+                self.assertIsInstance(polarity, int)
+                self.assertIn(polarity, range(0,4))
                 synapse = nada.models.Synapse.get_by_name(int(synapse_id))
                 self.assertEquals(synapse.polarity, polarity)
                 self.assertIn(neuron.name, [synapse.partner_neuron.name, synapse.neuron.name])
+
+    def test_S9_voxel_list(self):
+        for neuron in nada.models.Neuron.objects.all():
+            neuron_id = neuron.name
+            url = reverse('voxel_list', args=['collection1', 'experiment1', 'layer1', 0,
+                                              0, 50, 0, 2000, 0, 2000, neuron_id])
+            self.assertEquals(url, '/voxel_list/collection1/experiment1/layer1/0/0,50/0,2000/0,2000/%s' % neuron_id)
+            response = self.client.get(url, format='json')
+            self.assertEquals(response.status_code, status.HTTP_200_OK)
+            result = response.data
+            self.assertIsInstance(result, dict)
+            self.assertEquals(len(result), 3)
+            n_values = len(result.get('x'))
+            for coord in 'xyz':
+                self.assertIn(coord, result)
+                values = result.get(coord, None)
+                self.assertEquals(len(values), n_values)
+            values = [result[c] for c in 'xyz']
+            for voxel in zip(*values):
+                self.assertTrue(Point(voxel).within(neuron.geometry))
 
     def tearDown(self):
         nuke_all(NEURONS_CLASSES)
         self.assertTrue(is_empty(NEURONS_CLASSES))
         nuke_all(BOSS_CLASSES)
         self.assertTrue(is_empty(BOSS_CLASSES))
-

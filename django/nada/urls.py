@@ -32,5 +32,10 @@ urlpatterns = [
     url(r'^synapse_parent/' + params('collection', 'experiment', 'layer', 'id') + r'/?$',
         views.synapse_parent, name='synapse_parent'),
     url(r'^neuron_children/' + params('collection', 'experiment', 'layer', 'id') + r'/?$',
-        views.neuron_children, name='neuron_children')
+        views.neuron_children, name='neuron_children'),
+    url(r'^voxel_list/' + params('collection', 'experiment', 'layer', 'resolution',
+                                 ['x_start', 'x_stop'],
+                                 ['y_start', 'y_stop'],
+                                 ['z_start', 'z_stop'], 'id') + r'/?$', 
+        views.voxel_list, name='voxel_list')
 ]

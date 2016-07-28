@@ -20,6 +20,11 @@ class TheBossTestCase(unittest.TestCase):
         experiment = boss.get_experiment('experiment1', 'collection1')
         self.assertEquals(experiment.name, 'experiment1')
 
+    def test_get_layer(self):
+        boss = BossClient()
+        layer = boss.get_layer('layer1', 'collection1', 'experiment1')
+        self.assertEquals(layer.name, 'layer1')
+    
     def test_get_channel(self):
         boss = BossClient()
         channel = boss.get_channel('channel1', 'collection1', 'experiment1')

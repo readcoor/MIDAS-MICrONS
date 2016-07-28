@@ -1,5 +1,5 @@
 from ndio.remote.boss.remote import Remote, LATEST_VERSION
-from ndio.ndresource.boss.resource import CollectionResource, ExperimentResource, ChannelResource
+from ndio.ndresource.boss.resource import CollectionResource, ExperimentResource, LayerResource, ChannelResource
 
 from django.conf import settings
 
@@ -38,6 +38,10 @@ class BossClient:
     def get_experiment(self, experiment_name, collection_name):
         experiment = ExperimentResource(experiment_name, collection_name, version=self.api_version)
         return self.remote_get(experiment)
+
+    def get_layer(self, layer_name, collection_name, experiment_name):
+        layer = LayerResource(layer_name, collection_name, experiment_name, version=self.api_version)
+        return self.remote_get(layer)
 
     def get_channel(self, channel_name, collection_name, experiment_name):
         channel = ChannelResource(channel_name, collection_name, experiment_name, version=self.api_version)

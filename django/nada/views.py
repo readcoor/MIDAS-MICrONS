@@ -11,22 +11,19 @@ def is_synapse(request, collection=None, experiment=None, layer=None, id=None):
     result = { "result": not (synapse == None) }
     return Response(result, status=status.HTTP_200_OK)
 
-# S5
-@api_view(['GET'])
-def is_neuron(request, collection=None, experiment=None, layer=None, id=None):
-    neuron = Neuron.get_by_celi(collection, experiment, layer, id)
-    result = { "result": not (neuron == None) }
-    return Response(result, status=status.HTTP_200_OK)
 
-
-def bounded_view(cls, table_name, x_start, y_start, z_start, x_stop, y_stop, z_stop):
+def bounded_view(cls, table_name, x_start, y_start, z_start, x_stop, y_stop, z_stop, name=None):
     '''
     Returns a query of objects (specified by cls, table_name)
     within a bounded volume.
+    If name is provided, also filter for only objects with that name. 
     '''
     box = 'ST_3DMakeBox(ST_MakePoint(%s,%s,%s),ST_MakePoint(%s,%s,%s))' % \
           (x_start, y_start, z_start, x_stop, y_stop, z_stop)
-    query = 'select id from %s as s where s.keypoint &&& %s;' % (table_name, box)
+    where_name = ''
+    if name:
+        where_name = " and name = '%s'" % name
+    query = 'select id from %s as s where s.keypoint &&& %s %s;' % (table_name, box, where_name)
     return cls.objects.raw(query)
 
 # S2
@@ -43,20 +40,6 @@ def synapse_ids(request, collection=None, experiment=None, layer=None, resolutio
     result = { "ids": [obj.name for obj in view] }
     return Response(result, status=status.HTTP_200_OK)
 
-# S6
-@api_view(['GET'])
-def neuron_ids(request, collection=None, experiment=None, layer=None, resolution=None,
-                           x_start=None, x_stop=None,
-                           y_start=None, y_stop=None,
-                           z_start=None, z_stop=None
-                           ):
-    '''
-    TODO: does not filter for CELI just yet.
-    '''
-    view = bounded_view(Neuron, 'nada_neuron', x_start, y_start, z_start, x_stop, y_stop, z_stop)
-    result = { "ids": [obj.name for obj in view] }
-    return Response(result, status=status.HTTP_200_OK)
-
 # S3 
 @api_view(['GET'])
 def synapse_keypoint(request, collection=None, experiment=None, layer=None, resolution=None, id=None):
@@ -67,18 +50,6 @@ def synapse_keypoint(request, collection=None, experiment=None, layer=None, reso
     err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, resolution=%s, id=%s" % \
               ('synapse', collection, experiment, layer, resolution, id)
     return Response(err_msg, status.HTTP_404_NOT_FOUND)
-
-# S7
-@api_view(['GET'])
-def neuron_keypoint(request, collection=None, experiment=None, layer=None, resolution=None, id=None):
-    neuron = Neuron.get_by_celi(collection, experiment, layer, id)
-    if neuron:
-        result = { "keypoint": neuron.keypoint.coords }
-        return Response(result, status=status.HTTP_200_OK)
-    err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, resolution=%s, id=%s" % \
-              ('neuron', collection, experiment, layer, resolution, id)
-    return Response(err_msg, status.HTTP_404_NOT_FOUND)
-
 
 # S4
 @api_view(['GET'])
@@ -96,7 +67,40 @@ def synapse_parent(request, collection=None, experiment=None, layer=None, id=Non
                 neurons[neuron2.name] = partner.polarity
         result = { "parent_neurons": neurons }
         return Response(result, status=status.HTTP_200_OK)
-    err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, id=%s" % (collection, experiment, layer, id)
+    err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, id=%s" % \
+              ('synapse', collection, experiment, layer, id)
+    return Response(err_msg, status.HTTP_404_NOT_FOUND)
+
+# S5
+@api_view(['GET'])
+def is_neuron(request, collection=None, experiment=None, layer=None, id=None):
+    neuron = Neuron.get_by_celi(collection, experiment, layer, id)
+    result = { "result": not (neuron == None) }
+    return Response(result, status=status.HTTP_200_OK)
+
+# S6
+@api_view(['GET'])
+def neuron_ids(request, collection=None, experiment=None, layer=None, resolution=None,
+                           x_start=None, x_stop=None,
+                           y_start=None, y_stop=None,
+                           z_start=None, z_stop=None
+                           ):
+    '''
+    TODO: does not filter for CELI just yet.
+    '''
+    view = bounded_view(Neuron, 'nada_neuron', x_start, y_start, z_start, x_stop, y_stop, z_stop)
+    result = { "ids": [obj.name for obj in view] }
+    return Response(result, status=status.HTTP_200_OK)
+
+# S7
+@api_view(['GET'])
+def neuron_keypoint(request, collection=None, experiment=None, layer=None, resolution=None, id=None):
+    neuron = Neuron.get_by_celi(collection, experiment, layer, id)
+    if neuron:
+        result = { "keypoint": neuron.keypoint.coords }
+        return Response(result, status=status.HTTP_200_OK)
+    err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, resolution=%s, id=%s" % \
+              ('neuron', collection, experiment, layer, resolution, id)
     return Response(err_msg, status.HTTP_404_NOT_FOUND)
 
 # S8
@@ -109,31 +113,43 @@ def neuron_children(request, collection=None, experiment=None, layer=None,  reso
     if neuron:
         result = { "child_synapses": dict([(s.name, s.polarity) for s in neuron.synapses.all() ]) }
         return Response(result, status=status.HTTP_200_OK)
-    err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, id=%s" % (collection, experiment, layer, id)
+    err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, id=%s" % \
+              ('neuron', collection, experiment, layer, id)
     return Response(err_msg, status.HTTP_404_NOT_FOUND)
 
 
 # S9
 @api_view(['GET'])
-def voxel_list_local(request, collection=None, experiment=None, layer=None,  resolution=None,
+def voxel_list(request, collection=None, experiment=None, layer=None,  resolution=None,
                      x_start=None, x_stop=None,
                      y_start=None, y_stop=None,
                      z_start=None, z_stop=None, id=None):
-    result = { "x": [0, 0, 0, 1, 1, 1],
-               "y": [1, 0, 1, 0, 1, 0],
-               "z": [1, 2, 3, 1, 2, 3] }
+    view = bounded_view(Neuron, 'nada_neuron', x_start, y_start, z_start, x_stop, y_stop, z_stop, name=id)
+    result = [neuron for neuron in view]
+    if len(result)==0:
+        err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, id=%s" % \
+                  ('object', collection, experiment, layer, id)
+        return Response(err_msg, status.HTTP_404_NOT_FOUND)
+    if len(result)>1:
+        err_msg = "Not unique, found %s objects with collection=%s, experiment=%s, layer=%s, id=%s" % \
+                  (len(result), collection, experiment, layer, id)
+        return Response(err_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
+    neuron = result[0]
+    coords = [coord for coord in zip(*neuron.geometry)]
+    result = { "x": coords[0],
+               "y": coords[1],
+               "z": coords[2] }
     return Response(result, status=status.HTTP_200_OK)
 
 
-# S9
+# S9 - proxy call to theboss.io
 @api_view(['GET'])
-def voxel_list(request, collection=None, experiment=None, layer=None,  resolution=None,
+def voxel_list_remote(request, collection=None, experiment=None, layer=None,  resolution=None,
                x_start=None, x_stop=None,
                y_start=None, y_stop=None,
                z_start=None, z_stop=None, id=None):
+    # Proxy call to theboss.io
     boss = BossClient()
-    result = boss.test(collection, experiment)
-    result = { "x": [0, 0, 0, 1, 1, 1],
-               "y": [1, 0, 1, 0, 1, 0],
-               "z": [1, 2, 3, 1, 2, 3] }
-    return Response(result, status=status.HTTP_200_OK)
+    # Dummy placeholder - Need voxels instead
+    result = boss.get_layer(layer, collection, experiment)
+    return Response(result.raw, status=status.HTTP_200_OK)

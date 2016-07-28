@@ -124,8 +124,9 @@ class NdaIcdTestCase(APITestCase):
     def test_S8_neuron_children(self):
         for neuron in nada.models.Neuron.objects.all():
             neuron_id = neuron.name
-            url = reverse('neuron_children', args=['collection1', 'experiment1', 'layer1', neuron_id])
-            self.assertEquals(url, '/neuron_children/collection1/experiment1/layer1/%s' % neuron_id)
+            url = reverse('neuron_children', args=['collection1', 'experiment1', 'layer1', 0,
+                                                   0, 50, 0, 2000, 0, 2000, neuron_id])
+            self.assertEquals(url, '/neuron_children/collection1/experiment1/layer1/0/0,50/0,2000/0,2000/%s' % neuron_id)
             response = self.client.get(url, format='json')
             self.assertEquals(response.status_code, status.HTTP_200_OK)
             result = response.data.get('child_synapses', None)

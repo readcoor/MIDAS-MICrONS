@@ -17,7 +17,10 @@ class FixturesTestCase(APITestCase):
         for (cls, count) in [(nada.models.Collection, 1),
                              (nada.models.CoordinateFrame, 1),
                              (nada.models.Experiment, 2),
-                             (nada.models.Layer, 10)]:
+                             (nada.models.Layer, 10),
+                             (nada.models.Neuron, NEURONS_TEST_OPTIONS['N_NEURONS']),
+                             (nada.models.Synapse, NEURONS_TEST_OPTIONS['N_SYNAPSES'])
+                             ]:
             found = len(cls.objects.all())
             self.assertEquals(found, count, 'Expected %s instances of %s, but found %s' % (count, cls, found))
 

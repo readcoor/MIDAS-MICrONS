@@ -2,9 +2,11 @@ from django.db import models
 from .util import NameLookupMixin, ChoiceEnum
 from .samples import Experiment, Layer
 from django.contrib.gis.db import models as gis_models
-from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework import status
 
-__all__ = ['Neuron', 'Synapse', 'Polarity']
+
+__all__ = ['Neuron', 'Synapse', 'Polarity', 'CellType', 'Compartment']
 
 class Polarity(ChoiceEnum):
     "Allowed synapse polarity values (Enum)"
@@ -13,13 +15,20 @@ class Polarity(ChoiceEnum):
     post = 2
     bidirectional = 3
 
-# PLACEHOLDER VALUES
 class CellType(ChoiceEnum):
     "Allowed cell type values (Enum)"
     unknown = 0
-    red = 1
-    green = 2
-    blue = 3
+    excitatory = 1
+    inhibitory = 2
+
+class Compartment(ChoiceEnum):
+    "Allowed synapse compartment values (Enum)"
+    unknown = 0
+    soma = 1
+    proximal = 2
+    distal = 3
+    apical = 4
+    axon = 5
 
 class CELIMixin:
     """
@@ -36,22 +45,18 @@ class CELIMixin:
                .filter(name=id) \
                .first()
 
-class IdsInVolumeMixin:
-    """
-    Looks up an object (neuron or synapse) matching the given collection/experiment/layer within a
-    given volume.
-    Returns None if none found.
-    """
-    
     @classmethod
-    def get_ids_in_volume(cls, collection_name, experiment_name, layer_name, x_start, x_stop, y_start, y_stop, z_start, z_stop):
-        query = cls.objects \
-               .filter(experiment__collection__name=collection_name) \
-               .filter(experiment__name=experiment_name) \
-               .filter(layer__name=layer_name)
-        volume = foo()
-        in_volume = query.filter(poly__contains=geom)
-
+    def get_obj_or_400(cls, collection_name, experiment_name, layer_name, id):
+        '''
+        If obj is None, Raise HTTP 400 Bad Request error
+        Similar to django.shortcuts.get_object_or_404
+        '''
+        obj = cls.get_by_celi(collection_name, experiment_name, layer_name, id)
+        if obj is None:
+            err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, id=%s" % \
+                      (cls.__name__, collection_name, experiment_name, layer_name, id)
+            return Response(err_msg, status.HTTP_400_BAD_REQUEST)
+        return obj
 
 
 class Neuron(NameLookupMixin, CELIMixin, models.Model):
@@ -61,13 +66,10 @@ class Neuron(NameLookupMixin, CELIMixin, models.Model):
     name = models.BigIntegerField(unique=True)
     experiment = models.ForeignKey(Experiment, related_name='neurons', on_delete=models.PROTECT) # Parent
     layer = models.ForeignKey(Layer, related_name='neurons', on_delete=models.PROTECT) # Parent
-    cell_type = models.IntegerField(choices=CellType.choices(), default=CellType.unknown.value)
+    cell_type = models.IntegerField(choices=CellType.choices(), default=CellType.unknown.value, null=False)
     geometry = gis_models.MultiPointField(dim=3) # [Point(x,y,z)...]
     keypoint = gis_models.PointField(dim=3) # Point(x,y,z)
-    # activity - TBD
 
-    # a = nada.models.Neuron.get_by_name(444)
-    # b = nada.models.Neuron.get_by_celi('collection1', 'experiment1', 'layer1', 444)
 
 class Synapse(NameLookupMixin, CELIMixin, models.Model):
     """
@@ -87,7 +89,5 @@ class Synapse(NameLookupMixin, CELIMixin, models.Model):
                                            on_delete=models.CASCADE)
     geometry = gis_models.MultiPointField(dim=3)   # [ GISPoint(x,y,z), ... ]
     keypoint = gis_models.PointField(dim=3)        # GISPoint(x,y,z)
-    polarity = models.IntegerField(choices=Polarity.choices(), default=Polarity.unknown.value)
-    compartment = models.FloatField()
-
-
+    polarity = models.IntegerField(choices=Polarity.choices(), default=Polarity.unknown.value, null=False)
+    compartment = models.IntegerField(choices=Compartment.choices(), default=Compartment.unknown.value, null=False)

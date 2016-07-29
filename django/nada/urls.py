@@ -41,5 +41,10 @@ urlpatterns = [
                                  ['x_start', 'x_stop'],
                                  ['y_start', 'y_stop'],
                                  ['z_start', 'z_stop'], 'id') + r'/?$', 
-        views.voxel_list, name='voxel_list')
-]
+        views.voxel_list, name='voxel_list'),
+    url(r'^synapse_compartment/' + params('collection', 'experiment', 'layer', 'id') + r'/?$',
+        views.synapse_compartment, name='synapse_compartment'),
+    url(r'^neuron_celltype/' + params('collection', 'experiment', 'layer', 'id') + r'/?$',
+        views.neuron_celltype, name='neuron_celltype')
+    ]
+

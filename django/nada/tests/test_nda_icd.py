@@ -29,9 +29,17 @@ class NdaIcdTestCase(APITestCase):
             url = reverse('is_synapse', args=['collection1', 'experiment1', 'layer2', s_id])
             self.assertEquals(url, '/is_synapse/collection1/experiment1/layer2/%s' % s_id)
             response = self.client.get(url, format='json')
+            self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_S1_is_synapse_wrong_object(self):
+        for s_id in [12, 32, 43]: # random test values of actual synapses
+            url = reverse('is_synapse', args=['collection1', 'experiment1', 'layer1', s_id])
+            self.assertEquals(url, '/is_synapse/collection1/experiment1/layer1/%s' % s_id)
+            response = self.client.get(url, format='json')
             self.assertEquals(response.status_code, status.HTTP_200_OK)
             result = response.data
-            self.assertFalse(result.get('result', None))
+            # find a neuron instead of a synapse, return False
+            self.assertEquals(False, result.get('result', None))
 
     def test_S2_synapse_ids(self):
         url = reverse('synapse_ids', args=['collection1', 'experiment1', 'layer2', 0, 0, 50, 0, 2000, 0, 2000])
@@ -65,7 +73,7 @@ class NdaIcdTestCase(APITestCase):
             self.assertEquals(response.status_code, status.HTTP_200_OK)
             result = response.data.get('parent_neurons', None)
             self.assertIsInstance(result, dict)
-            # test synapse should have exactly one pre-synapse neuron and one post-synapse neuron
+            # each synapse should have exactly one pre-synapse neuron and one post-synapse neuron
             self.assertEquals(len(result), 2)
             self.assertIn(nada.models.Polarity.pre.value, result.values())
             self.assertIn(nada.models.Polarity.post.value, result.values())
@@ -94,9 +102,17 @@ class NdaIcdTestCase(APITestCase):
             url = reverse('is_neuron', args=['collection1', 'experiment1', 'layer1', n_id])
             self.assertEquals(url, '/is_neuron/collection1/experiment1/layer1/%s' % n_id)
             response = self.client.get(url, format='json')
+            self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_S5_is_neuron_wrong_object(self):
+        for n_id in [12, 32, 49]: # random test values of actual neurons
+            url = reverse('is_neuron', args=['collection1', 'experiment1', 'layer2', n_id])
+            self.assertEquals(url, '/is_neuron/collection1/experiment1/layer2/%s' % n_id)
+            response = self.client.get(url, format='json')
             self.assertEquals(response.status_code, status.HTTP_200_OK)
             result = response.data
-            self.assertFalse(result.get('result', None))
+            # found synapse instead of neuron, return False
+            self.assertEquals(False, result.get('result', None))
 
     def test_S6_neuron_ids(self):
         url = reverse('neuron_ids', args=['collection1', 'experiment1', 'layer1', 0, 0, 50, 0, 2000, 0, 2000])
@@ -158,6 +174,32 @@ class NdaIcdTestCase(APITestCase):
             values = [result[c] for c in 'xyz']
             for voxel in zip(*values):
                 self.assertTrue(Point(voxel).within(neuron.geometry))
+
+    def test_SA1_synapse_compartment(self):
+        for synapse in nada.models.Synapse.objects.all():
+            synapse_id = synapse.name
+            url = reverse('synapse_compartment', args=['collection1', 'experiment1', 'layer2', synapse_id])
+            self.assertEquals(url, '/synapse_compartment/collection1/experiment1/layer2/%s' % synapse_id)
+            response = self.client.get(url, format='json')
+            self.assertEquals(response.status_code, status.HTTP_200_OK)
+            self.assertIsInstance(response.data, dict)
+            self.assertEquals(len(response.data), 1)
+            result = response.data.get('compartment', None)
+            self.assertIsInstance(result, str)
+            self.assertEquals(result, nada.models.Compartment(synapse.compartment).name)
+
+    def test_SA2_neuron_celltype(self):
+        for neuron in nada.models.Neuron.objects.all():
+            neuron_id = neuron.name
+            url = reverse('neuron_celltype', args=['collection1', 'experiment1', 'layer1', neuron_id])
+            self.assertEquals(url, '/neuron_celltype/collection1/experiment1/layer1/%s' % neuron_id)
+            response = self.client.get(url, format='json')
+            self.assertEquals(response.status_code, status.HTTP_200_OK)
+            self.assertIsInstance(response.data, dict)
+            self.assertEquals(len(response.data), 1)
+            result = response.data.get('cell_type', None)
+            self.assertIsInstance(result, str)
+            self.assertEquals(result, nada.models.CellType(neuron.cell_type).name)            
 
     def tearDown(self):
         nuke_all(NEURONS_CLASSES)

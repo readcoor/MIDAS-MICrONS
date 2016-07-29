@@ -1,5 +1,4 @@
 from django.db import models
-import inspect
 from enum import IntEnum
 
 class NameLookupMixin:

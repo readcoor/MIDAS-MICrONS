@@ -1,12 +1,12 @@
 import random
 from . import boss
-from ..models import Neuron, Synapse, Polarity, Layer
+from ..models import Neuron, Synapse, Layer, Polarity, CellType, Compartment
 from django.contrib.gis.geos import Point, MultiPoint
 
 NEURONS_CLASSES = [Neuron, Synapse]
 
-# nada.fixtures.utils.nuke_all(nada.fixtures.BOSS_CLASSES)
 # nada.fixtures.utils.nuke_all(nada.fixtures.NEURONS_CLASSES)
+# nada.fixtures.utils.nuke_all(nada.fixtures.BOSS_CLASSES)
 #
 # nada.fixtures.utils.is_empty(nada.fixtures.NEURONS_CLASSES)
 #
@@ -49,6 +49,11 @@ def neurons_setup(**options):
                for p in range(0, options['POINTS_PER_NEURON'])]
         neuron.geometry = MultiPoint(pts)
         neuron.keypoint = Point(neuron_id, center_y, center_z) # neuron.geometry.centroid is 2D
+        if neuron_id > 0:
+            if (neuron_id % 2 == 0):    # odd or even (0 == 'unknown')
+                neuron.cell_type = CellType.excitatory
+            else:
+                neuron.cell_type = CellType.inhibitory
         neuron.save()
 
     assert(len(neurons) == options['N_NEURONS'])
@@ -68,6 +73,9 @@ def neurons_setup(**options):
                for p in range(0, options['POINTS_PER_SYNAPSE'])]
         synapse.geometry = MultiPoint(pts)
         synapse.keypoint = Point(synapse_id, center_y, center_z) # synapse.geometry.centroid is 2D
+        max_compartment_value = (Compartment.axon.value + 1) # axon == 5
+        synapse.compartment = Compartment(synapse_id % max_compartment_value) # assign value between 0-5
+        
     while len(synapses)>0:
         synapse = synapses[0]
         if synapse.partner_synapse == None:

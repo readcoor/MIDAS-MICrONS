@@ -5,7 +5,7 @@ from django.conf import settings
 
 class TheBossTestCase(unittest.TestCase):
 
-    def test_assumptions(self):
+    def test_config_file(self):
         'confirm we have a config file for TheBoss'
         config_file = settings.THEBOSS_CONFIG
         self.assertTrue(os.path.exists(config_file))

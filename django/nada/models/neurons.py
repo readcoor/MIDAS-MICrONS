@@ -66,9 +66,10 @@ class Neuron(NameLookupMixin, CELIMixin, models.Model):
     name = models.BigIntegerField(unique=True)
     experiment = models.ForeignKey(Experiment, related_name='neurons', on_delete=models.PROTECT) # Parent
     layer = models.ForeignKey(Layer, related_name='neurons', on_delete=models.PROTECT) # Parent
-    cell_type = models.IntegerField(choices=CellType.choices(), default=CellType.unknown.value, null=False)
-    geometry = gis_models.MultiPointField(dim=3) # [Point(x,y,z)...]
-    keypoint = gis_models.PointField(dim=3) # Point(x,y,z)
+    cell_type = models.IntegerField(choices=CellType.choices(), default=CellType.unknown.value)
+    geometry = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False) # [Point(x,y,z)...]
+    keypoint = gis_models.PointField(dim=3, srid=0, spatial_index=False) # Point(x,y,z)
+    # activity - TBD
 
 
 class Synapse(NameLookupMixin, CELIMixin, models.Model):
@@ -87,7 +88,7 @@ class Synapse(NameLookupMixin, CELIMixin, models.Model):
                                            related_name='+',  # Use partner_synapse for both partners.
                                                               # No backwards relation
                                            on_delete=models.CASCADE)
-    geometry = gis_models.MultiPointField(dim=3)   # [ GISPoint(x,y,z), ... ]
-    keypoint = gis_models.PointField(dim=3)        # GISPoint(x,y,z)
-    polarity = models.IntegerField(choices=Polarity.choices(), default=Polarity.unknown.value, null=False)
-    compartment = models.IntegerField(choices=Compartment.choices(), default=Compartment.unknown.value, null=False)
+    geometry = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False)   # [ GISPoint(x,y,z), ... ]
+    keypoint = gis_models.PointField(dim=3, srid=0, spatial_index=False)        # GISPoint(x,y,z)
+    polarity = models.IntegerField(choices=Polarity.choices(), default=Polarity.unknown.value)
+    compartment = models.FloatField()

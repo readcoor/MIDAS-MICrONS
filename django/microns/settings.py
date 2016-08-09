@@ -27,11 +27,22 @@ SECRET_KEY = 'h3b6id_c(2%#_949y7l6yrn+wjm8-2g4z#($4uobqax)@cs(h('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Requests over HTTP are redirected to HTTPS
+SECURE_SSL_REDIRECT = True
+
+# Only send cookies over HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+SECURE_HSTS_SECONDS = 3600 # 31536000 = 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
 ALLOWED_HOSTS = []
 
 # Application definition
 
 INSTALLED_APPS = [
+    'sslserver',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -35,6 +35,13 @@ $ `vagrant up`
   [Deploying Django on Beanstalk](http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html)  
   Configure your [API credentials](https://console.aws.amazon.com/iam/home#users)  
  `$ eb init`  
+
+## Configure localhost for dev with https
+[https on local dev server](http://stackoverflow.com/questions/8169999/how-can-i-create-a-self-signed-cert-for-localhost)  
+[https on AWS](https://rickchristianson.wordpress.com/2013/10/31/getting-a-django-app-to-use-https-on-aws-elastic-beanstalk/)
+
+`$ openssl req -x509 -sha256 -nodes -newkey rsa:2048 -days 365 -keyout localhost.key -out localhost.crt`  
+`$ python3 manage.py runsslserver '0.0.0.0:8000' --certificate /path/to/localhost.crt --key /path/to/localhost.key`
   
 
 ## Manage django on AWS instance

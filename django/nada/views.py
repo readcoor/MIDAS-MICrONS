@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Neuron, Synapse
+from .models import Neuron, Synapse, Compartment, CellType
 from .boss_client import BossClient
 
 from psycopg2.extensions import adapt as esc
@@ -27,13 +27,8 @@ def filtered_query(cls, collection, experiment, layer,
     (collection_e, experiment_e, layer_e) = (esc(collection), esc(experiment), esc(layer))
 
     # ensure numeric values for xyz start/stop boundaries
-    try:
-        (x_start_n, y_start_n, z_start_n, x_stop_n, y_stop_n, z_stop_n) = \
-                    [num(s) for s in [x_start, y_start, z_start, x_stop, y_stop, z_stop]]
-    except Exception as e:
-        print('\nerr', [x_start, y_start, z_start, x_stop, y_stop, z_stop], id)
-        print(cls, collection, experiment, layer)
-        raise e
+    (x_start_n, y_start_n, z_start_n, x_stop_n, y_stop_n, z_stop_n) = \
+                [num(s) for s in [x_start, y_start, z_start, x_stop, y_stop, z_stop]]
 
     box = 'ST_3DMakeBox(ST_MakePoint(%s,%s,%s),ST_MakePoint(%s,%s,%s))' % \
           (x_start_n, y_start_n, z_start_n, x_stop_n, y_stop_n, z_stop_n)
@@ -64,7 +59,7 @@ def get_filtered_object(cls, collection, experiment, layer,
                         x_start, y_start, z_start, x_stop, y_stop, z_stop, id):
     '''
     Returns a single object (neuron or synapse) in the given location with the given ID.
-    Raises an http 404 error if no object is found.
+    Raises an http 400 error if no object is found.
     Raises a 500 error if more than one object with the same ID and location is found.
     '''
     objs = [obj for obj in \
@@ -73,7 +68,7 @@ def get_filtered_object(cls, collection, experiment, layer,
     if len(objs)==0:
         err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, id=%s" % \
                   (cls.__name__, collection, experiment, layer, id)
-        return Response(err_msg, status.HTTP_404_NOT_FOUND)
+        return Response(err_msg, status.HTTP_400_BAD_REQUEST)
     if len(objs)>1:
         err_msg = "Not unique, found %s objects with collection=%s, experiment=%s, layer=%s, id=%s" % \
                   (len(result), collection, experiment, layer, id)
@@ -84,8 +79,16 @@ def get_filtered_object(cls, collection, experiment, layer,
 # S1
 @api_view(['GET'])
 def is_synapse(request, collection, experiment, layer, id):
-    synapse = Synapse.get_by_celi(collection, experiment, layer, id)
-    result = { "result": not (synapse == None) }
+    synapse = Synapse.get_obj_or_400(collection, experiment, layer, id)
+    if isinstance(synapse, Synapse):
+        found = True
+    else:
+        neuron = Neuron.get_obj_or_400(collection, experiment, layer, id)
+        if isinstance(neuron, Neuron):
+            found = False   # found a Neuron instead of a Synapse, so return false
+        else:
+            return synapse  # return HTTP_400 response
+    result = { "result": found }
     return Response(result, status=status.HTTP_200_OK)
 
 # S2
@@ -100,39 +103,44 @@ def synapse_ids(request, collection, experiment, layer, resolution,
 # S3 
 @api_view(['GET'])
 def synapse_keypoint(request, collection, experiment, layer, resolution, id):
-    synapse = Synapse.get_by_celi(collection, experiment, layer, id)
-    if synapse:
-        result = { "keypoint": synapse.keypoint.coords }
-        return Response(result, status=status.HTTP_200_OK)
-    err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, resolution=%s, id=%s" % \
-              ('synapse', collection, experiment, layer, resolution, id)
-    return Response(err_msg, status.HTTP_404_NOT_FOUND)
+    synapse = Synapse.get_obj_or_400(collection, experiment, layer, id)
+    if isinstance(synapse, Response):
+        return synapse  # return HTTP_400 response
+    result = { "keypoint": synapse.keypoint.coords }
+    return Response(result, status=status.HTTP_200_OK)
 
 # S4
 @api_view(['GET'])
 def synapse_parent(request, collection, experiment, layer, id):
-    synapse = Synapse.get_by_celi(collection, experiment, layer, id)
-    if synapse:
-        neurons = {}
-        neuron1 = synapse.neuron
-        if neuron1:
-            neurons[neuron1.name] = synapse.polarity
-        neuron2 = synapse.partner_neuron
-        if neuron2:
-            partner = synapse.partner_synapse
-            if partner:
-                neurons[neuron2.name] = partner.polarity
-        result = { "parent_neurons": neurons }
-        return Response(result, status=status.HTTP_200_OK)
-    err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, id=%s" % \
-              ('synapse', collection, experiment, layer, id)
-    return Response(err_msg, status.HTTP_404_NOT_FOUND)
+    synapse = Synapse.get_obj_or_400(collection, experiment, layer, id)
+    if isinstance(synapse, Response):
+        return synapse  # return HTTP_400 response
+    neurons = {}
+    neuron1 = synapse.neuron
+    if neuron1:
+        neurons[neuron1.name] = synapse.polarity
+    neuron2 = synapse.partner_neuron
+    if neuron2:
+        partner = synapse.partner_synapse
+        if partner:
+            neurons[neuron2.name] = partner.polarity
+    result = { "parent_neurons": neurons }
+    return Response(result, status=status.HTTP_200_OK)
+
 
 # S5
 @api_view(['GET'])
 def is_neuron(request, collection, experiment, layer, id):
-    neuron = Neuron.get_by_celi(collection, experiment, layer, id)
-    result = { "result": not (neuron == None) }
+    neuron = Neuron.get_obj_or_400(collection, experiment, layer, id)
+    if isinstance(neuron, Neuron):
+        found = True
+    else:
+        synapse = Synapse.get_obj_or_400(collection, experiment, layer, id)
+        if isinstance(synapse, Synapse):
+            found = False   # found a Synapse instead of a Neuron, so return false
+        else:
+            return neuron  # return HTTP_400 response
+    result = { "result": found }
     return Response(result, status=status.HTTP_200_OK)
 
 # S6
@@ -147,13 +155,11 @@ def neuron_ids(request, collection, experiment, layer, resolution,
 # S7
 @api_view(['GET'])
 def neuron_keypoint(request, collection, experiment, layer, resolution, id):
-    neuron = Neuron.get_by_celi(collection, experiment, layer, id)
-    if neuron:
-        result = { "keypoint": neuron.keypoint.coords }
-        return Response(result, status=status.HTTP_200_OK)
-    err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, resolution=%s, id=%s" % \
-              ('neuron', collection, experiment, layer, resolution, id)
-    return Response(err_msg, status.HTTP_404_NOT_FOUND)
+    neuron = Neuron.get_obj_or_400(collection, experiment, layer, id)
+    if isinstance(neuron, Response):
+        return neuron  # return HTTP_400 response
+    result = { "keypoint": neuron.keypoint.coords }
+    return Response(result, status=status.HTTP_200_OK)
 
 # S8
 @api_view(['GET'])
@@ -188,3 +194,22 @@ def voxel_list_remote(request, collection, experiment, layer,  resolution,
     # Dummy placeholder - Need voxels instead
     result = boss.get_layer(layer, collection, experiment)
     return Response(result.raw, status=status.HTTP_200_OK)
+
+
+# SA1
+@api_view(['GET'])
+def synapse_compartment(request, collection, experiment, layer,  id):
+    synapse = Synapse.get_obj_or_400(collection, experiment, layer, id)
+    if isinstance(synapse, Response):
+        return synapse  # return HTTP_400 response
+    result = { "compartment": Compartment(synapse.compartment).name }
+    return Response(result, status=status.HTTP_200_OK)
+
+# SA2
+@api_view(['GET'])
+def neuron_celltype(request, collection, experiment, layer,  id):
+    neuron= Neuron.get_obj_or_400(collection, experiment, layer, id)
+    if isinstance(neuron, Response):
+        return neuron  # return HTTP_400 response
+    result = { "cell_type": CellType(neuron.cell_type).name }
+    return Response(result, status=status.HTTP_200_OK)

@@ -17,27 +17,12 @@ class FixturesTestCase(APITestCase):
         for (cls, count) in [(nada.models.Collection, 1),
                              (nada.models.CoordinateFrame, 1),
                              (nada.models.Experiment, 2),
-                             (nada.models.Layer, 10)]:
+                             (nada.models.Layer, 10),
+                             (nada.models.Neuron, NEURONS_TEST_OPTIONS['N_NEURONS']),
+                             (nada.models.Synapse, NEURONS_TEST_OPTIONS['N_SYNAPSES'])
+                             ]:
             found = len(cls.objects.all())
             self.assertEquals(found, count, 'Expected %s instances of %s, but found %s' % (count, cls, found))
-
-
-    @unittest.skip("theboss views disabled for now")
-    def test_api_get_experiment(self):
-        url = reverse('experiment-detail', args=['collection1', 'experiment1'])
-        self.assertEquals(url, '/v1/resource/experiment/collection1/experiment1')
-        response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(response.data.get('name', None), 'experiment1')
-
-    @unittest.skip("theboss views disabled for now")
-    def test_api_get_layer(self):
-        url = reverse('layer-detail', args=['collection1', 'experiment2', 'layer4'])
-        self.assertEquals(url, '/v1/resource/layer/collection1/experiment2/layer4')
-        response = self.client.get(url, format='json')
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(response.data.get('name', None), 'layer4')
-
 
     def test_neuron_connections(self):
         for neuron in nada.models.Neuron.objects.all():
@@ -60,3 +45,4 @@ class FixturesTestCase(APITestCase):
         self.assertTrue(is_empty(NEURONS_CLASSES))
         nuke_all(BOSS_CLASSES)
         self.assertTrue(is_empty(BOSS_CLASSES))
+

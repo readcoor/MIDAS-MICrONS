@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # run just one test
-# python3 manage.py test nada.tests.test_nda_icd.NdaIcdTestCase.test_S9_voxel_list
+# python3 manage.py test nada.tests.test_nda_icd.NdaIcdTestCase.test_SA2_neuron_celltype
 
 # run just one test class
 # python3 manage.py test nada.tests.test_boss.TheBossTestCase

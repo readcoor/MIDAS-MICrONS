@@ -5,6 +5,7 @@ decorator==3.4.0
 Django==1.9.7
 django-rest-swagger==2.0.1
 djangorestframework==3.4
+django-sslserver==0.19
 docutils==0.12
 numpy==1.11.1
 pathspec==0.3.4

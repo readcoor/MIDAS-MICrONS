@@ -156,7 +156,7 @@ class Migration(migrations.Migration):
 				"	|| ' (name, cell_type, geometry, keypoint, experiment_id, layer_id) ' " +
 				"	|| ' SELECT $1, $2, $3, $4, $5, $6 ' ) " +
 				"	using NEW.name, NEW.cell_type, NEW.geometry::text, NEW.keypoint::text, NEW.experiment_id, NEW.layer_id; " +
-				"    RETURN NULL; " +
+				"    RETURN NEW; " +
 				"END; " +
 				"$$ " +
 				"LANGUAGE plpgsql;"),
@@ -177,7 +177,7 @@ class Migration(migrations.Migration):
 				"	|| ' (name, geometry, keypoint, polarity, compartment, experiment_id, layer_id, neuron_id, partner_neuron_id, partner_synapse_id) ' " +
 				"	|| ' SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10' ) " +
 				"	using NEW.name, NEW.geometry::text, NEW.keypoint::text, NEW.polarity, NEW.compartment, NEW.experiment_id, NEW.layer_id, NEW.neuron_id, NEW.partner_neuron_id, NEW.partner_synapse_id; " +
-				"    RETURN NULL; " +
+				"    RETURN NEW; " +
 				"END; " +
 				"$$ " +
 				"LANGUAGE plpgsql;"),

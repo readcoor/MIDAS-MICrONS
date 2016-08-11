@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.BigIntegerField(unique=True)),
-                ('cell_type', models.IntegerField(choices=[('unknown', 0), ('red', 1), ('green', 2), ('blue', 3)], default=0)),
+                ('cell_type', models.IntegerField(choices=[('unknown', 0), ('excitatory', 1), ('inhibitory', 2)], default=0)),
                 ('geometry', django.contrib.gis.db.models.fields.MultiPointField(dim=3, spatial_index=False, srid=0)),
                 ('keypoint', django.contrib.gis.db.models.fields.PointField(dim=3, spatial_index=False, srid=0)),
                 ('experiment', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='neurons', to='nada.Experiment')),

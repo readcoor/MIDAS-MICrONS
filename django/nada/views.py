@@ -59,8 +59,9 @@ def get_filtered_object(cls, collection, experiment, layer,
                         x_start, y_start, z_start, x_stop, y_stop, z_stop, id):
     '''
     Returns a single object (neuron or synapse) in the given location with the given ID.
-    Raises an http 400 error if no object is found.
-    Raises a 500 error if more than one object with the same ID and location is found.
+    Returns a Response object if an error occurs:
+       Response with an http 400 error if no object is found.
+       Response with a 500 error if more than one object with the same ID and location is found.
     '''
     objs = [obj for obj in \
             filtered_query(cls, collection, experiment, layer,
@@ -71,7 +72,7 @@ def get_filtered_object(cls, collection, experiment, layer,
         return Response(err_msg, status.HTTP_400_BAD_REQUEST)
     if len(objs)>1:
         err_msg = "Not unique, found %s objects with collection=%s, experiment=%s, layer=%s, id=%s" % \
-                  (len(result), collection, experiment, layer, id)
+                  (len(objs), collection, experiment, layer, id)
         return Response(err_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
     return objs[0]
 
@@ -167,6 +168,8 @@ def neuron_children(request, collection, experiment, layer,  resolution,
                         x_start, x_stop, y_start, y_stop, z_start, z_stop, id):
     neuron = get_filtered_object(Neuron, collection, experiment, layer,
                                  x_start, y_start, z_start, x_stop, y_stop, z_stop, id=id)
+    if isinstance(neuron, Response):
+        return neuron
     result = { "child_synapses": dict([(s.name, s.polarity) for s in neuron.synapses.all() ]) }
     return Response(result, status=status.HTTP_200_OK)
 
@@ -176,6 +179,8 @@ def voxel_list(request, collection, experiment, layer,  resolution,
                      x_start, x_stop, y_start, y_stop, z_start, z_stop, id):
     neuron = get_filtered_object(Neuron, collection, experiment, layer,
                                  x_start, y_start, z_start, x_stop, y_stop, z_stop, id=id)
+    if isinstance(neuron, Response):
+        return neuron    
     coords = [coord for coord in zip(*neuron.geometry)]
     result = { "x": coords[0],
                "y": coords[1],

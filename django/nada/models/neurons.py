@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-__all__ = ['Neuron', 'Synapse', 'Polarity', 'CellType', 'Compartment']
+__all__ = ['Neuron', 'Synapse', 'Polarity', 'CellType', 'Compartment',
+           'NeuronStimulus', 'NeuronActivity']
 
 class Polarity(ChoiceEnum):
     "Allowed synapse polarity values (Enum)"
@@ -58,6 +59,29 @@ class CELIMixin:
             return Response(err_msg, status.HTTP_400_BAD_REQUEST)
         return obj
 
+class TimeSeriesMixin:
+    """
+    Looks up time-series data for the given neuron within the given time interval.
+    Returns samples in ascending time order.
+    Returns None if none found.
+    """
+    @classmethod
+    def get_by_time(cls, experiment, neuron, start_time, end_time):
+        return cls.objects \
+               .filter(experiment=experiment) \
+               .filter(neuron=neuron) \
+               .filter(time__gte=start_time) \
+               .filter(time__lt=end_time) \
+               .order_by('time') \
+               .all()
+
+    @classmethod
+    def get_one(cls, experiment, neuron, time):
+        return cls.objects \
+               .filter(experiment=experiment) \
+               .filter(neuron=neuron) \
+               .filter(time=time) \
+               .get()
 
 class Neuron(NameLookupMixin, CELIMixin, models.Model):
     """
@@ -69,8 +93,6 @@ class Neuron(NameLookupMixin, CELIMixin, models.Model):
     cell_type = models.IntegerField(choices=CellType.choices(), default=CellType.unknown.value)
     geometry = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False) # [Point(x,y,z)...]
     keypoint = gis_models.PointField(dim=3, srid=0, spatial_index=False) # Point(x,y,z)
-    # activity - TBD
-
 
 class Synapse(NameLookupMixin, CELIMixin, models.Model):
     """
@@ -92,3 +114,25 @@ class Synapse(NameLookupMixin, CELIMixin, models.Model):
     keypoint = gis_models.PointField(dim=3, srid=0, spatial_index=False)        # GISPoint(x,y,z)
     polarity = models.IntegerField(choices=Polarity.choices(), default=Polarity.unknown.value)
     compartment = models.FloatField()
+
+class NeuronStimulus(TimeSeriesMixin, models.Model):
+    neuron = models.ForeignKey(Neuron, related_name='stimulus', on_delete=models.CASCADE,
+                               blank=False, null=False)
+    experiment = models.ForeignKey(Experiment, related_name='+', on_delete=models.CASCADE,
+                               blank=False, null=False)
+    time = models.IntegerField(blank=False, null=False)
+    value = models.IntegerField(blank=False, null=False)
+    
+    class Meta:
+        unique_together = (('neuron', 'experiment', 'time'),)
+
+class NeuronActivity(TimeSeriesMixin, models.Model):
+    neuron = models.ForeignKey(Neuron, related_name='activity', on_delete=models.CASCADE,
+                               blank=False, null=False)
+    experiment = models.ForeignKey(Experiment, related_name='+', on_delete=models.CASCADE,
+                               blank=False, null=False)
+    time = models.IntegerField(blank=False, null=False)
+    value = models.FloatField(blank=False, null=False)
+    
+    class Meta:
+        unique_together = (('neuron', 'experiment', 'time'),)

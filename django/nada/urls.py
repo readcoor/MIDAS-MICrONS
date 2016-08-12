@@ -45,6 +45,12 @@ urlpatterns = [
     url(r'^synapse_compartment/' + params('collection', 'experiment', 'layer', 'id') + r'/?$',
         views.synapse_compartment, name='synapse_compartment'),
     url(r'^neuron_celltype/' + params('collection', 'experiment', 'layer', 'id') + r'/?$',
-        views.neuron_celltype, name='neuron_celltype')
+        views.neuron_celltype, name='neuron_celltype'),
+    url(r'^neuron_stimulus/' + params('collection', 'experiment', 'layer', 'id',
+                                      ['start_time', 'end_time']) + r'/?$',
+        views.neuron_stimulus, name='neuron_stimulus'),
+    url(r'^neuron_activity/' + params('collection', 'experiment', 'layer', 'id',
+                                      ['start_time', 'end_time']) + r'/?$',
+        views.neuron_activity, name='neuron_activity')
     ]
 

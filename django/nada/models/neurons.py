@@ -1,4 +1,5 @@
 from django.db import models
+from django.db import connection
 from .util import NameLookupMixin, ChoiceEnum
 from .samples import Experiment, Layer
 from django.contrib.gis.db import models as gis_models
@@ -70,11 +71,17 @@ class Neuron(NameLookupMixin, CELIMixin, models.Model):
     geometry = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False) # [Point(x,y,z)...]
     keypoint = gis_models.PointField(dim=3, srid=0, spatial_index=False) # Point(x,y,z)
     # activity - TBD
+    
+    def insert(self, var):
+        cursor = connection.cursor()
+        cursor.callproc("neuron_insert_function", var)
+        results = cursor.fetchall()
+        cursor.close()
 
 
 class Mesh3D_FullTile(NameLookupMixin, CELIMixin, models.Model):
     """
-    A mesh of tile sized (2560, 2160, 50) rectangles
+    A mesh of tile-sized (2560, 2160, 50) rectangles
     """
     box = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False)
 
@@ -108,3 +115,10 @@ class Synapse(NameLookupMixin, CELIMixin, models.Model):
     keypoint = gis_models.PointField(dim=3, srid=0, spatial_index=False)        # GISPoint(x,y,z)
     polarity = models.IntegerField(choices=Polarity.choices(), default=Polarity.unknown.value)
     compartment = models.FloatField()
+    
+    def insert(self, var):
+        cursor = connection.cursor()
+        cursor.callproc("synapse_insert_function", var)
+        results = cursor.fetchall()
+        cursor.close()
+ 

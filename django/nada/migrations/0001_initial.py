@@ -145,6 +145,7 @@ class Migration(migrations.Migration):
 			"EXECUTE 'CREATE INDEX neurons_geom_' || LASTVAL() || ' on public.nada_neuron_' || LASTVAL() || ' USING gist(geometry gist_geometry_ops_nd)'; " +
 			"EXECUTE 'CREATE INDEX neurons_keypoint_' || LASTVAL() || ' on public.nada_neuron_' || LASTVAL() || ' USING gist(keypoint gist_geometry_ops_nd)'; " +
 			" " +
+            "EXECUTE 'DROP SEQUENCE IF EXISTS public.nada_neuron_to_mesh_' || LASTVAL() || '_id_seq';" +
 			"EXECUTE 'CREATE SEQUENCE public.nada_neuron_to_mesh_' || LASTVAL() || '_id_seq'; " +
 			"EXECUTE 'CREATE TABLE public.nada_neuron_to_mesh_' || LASTVAL() || ' (CHECK ( experiment_id = ' || LASTVAL() || ')) INHERITS (public.nada_neuron_to_mesh)'; " +
             "EXECUTE 'ALTER TABLE public.nada_neuron_to_mesh_' || LASTVAL() || ' ALTER COLUMN id SET DEFAULT NEXTVAL(' || quote_literal('nada_neuron_to_mesh_' || LASTVAL() || '_id_seq') || ')'; " +
@@ -181,7 +182,7 @@ class Migration(migrations.Migration):
 				"	|| ' (name, cell_type, geometry, keypoint, experiment_id, layer_id) ' " +
 				"	|| ' SELECT $1, $2, $3, $4, $5, $6 ' ) " +
 				"	using NEW.name, NEW.cell_type, NEW.geometry::text, NEW.keypoint::text, NEW.experiment_id, NEW.layer_id; " +
-				"    RETURN NEW; " +
+				"    RETURN NULL; " +
 				"END; " +
 				"$$ " +
 				"LANGUAGE plpgsql;"),
@@ -202,7 +203,7 @@ class Migration(migrations.Migration):
 				"	|| ' (name, geometry, keypoint, polarity, compartment, experiment_id, layer_id, neuron_id, partner_neuron_id, partner_synapse_id) ' " +
 				"	|| ' SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10' ) " +
 				"	using NEW.name, NEW.geometry::text, NEW.keypoint::text, NEW.polarity, NEW.compartment, NEW.experiment_id, NEW.layer_id, NEW.neuron_id, NEW.partner_neuron_id, NEW.partner_synapse_id; " +
-				"    RETURN NEW; " +
+				"    RETURN NULL; " +
 				"END; " +
 				"$$ " +
 				"LANGUAGE plpgsql;"),
@@ -242,6 +243,15 @@ class Migration(migrations.Migration):
                 "	|| ' (name, cell_type, geometry, keypoint, experiment_id, layer_id) '  " +
                 "	|| ' SELECT $1, $2, $3, $4, $5, $6 ' ) " +
                 "	USING name, cell_type, geometry::text, keypoint::text, experiment_id, layer_id;  " +
+                " " +                
+                "   EXECUTE format('INSERT INTO nada_neuron_to_mesh_'|| experiment_id  " +
+                "   || ' (neuron_id, experiment_id, mesh3d_fulltile_id) '  " +
+                "   || ' SELECT $1, '  " +
+                "   || ' $2, '  " +
+                "   || ' nada_mesh3d_fulltile.id '  " +
+                "   || ' FROM nada_mesh3d_fulltile WHERE $3 &&& nada_mesh3d_fulltile.box;')  " +
+                "   USING CURRVAL('nada_neuron_id_seq'::regclass), experiment_id, geometry::text;   " +
+                " " +
                 "    RETURN QUERY " +
                 "        EXECUTE format('SELECT * FROM nada_neuron_' || experiment_id || ' WHERE id = ' || CURRVAL('nada_neuron_id_seq'::regclass)); " +
                 "    RETURN; " +

@@ -108,6 +108,28 @@ class Migration(migrations.Migration):
             bases=(nada.models.util.NameLookupMixin, nada.models.neurons.CELIMixin, models.Model),
         ),
         migrations.CreateModel(
+            name='NeuronActivity',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('time', models.IntegerField()),
+                ('value', models.FloatField()),
+                ('experiment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to='nada.Experiment')),
+                ('neuron', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='activity', to='nada.Neuron')),
+            ],
+            bases=(nada.models.neurons.TimeSeriesMixin, models.Model),
+        ),
+        migrations.CreateModel(
+            name='NeuronStimulus',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('time', models.IntegerField()),
+                ('value', models.IntegerField()),
+                ('experiment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to='nada.Experiment')),
+                ('neuron', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='stimulus', to='nada.Neuron')),
+            ],
+            bases=(nada.models.neurons.TimeSeriesMixin, models.Model),
+        ),
+        migrations.CreateModel(
             name='Synapse',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -125,166 +147,19 @@ class Migration(migrations.Migration):
             bases=(nada.models.util.NameLookupMixin, nada.models.neurons.CELIMixin, models.Model),
         ),
         migrations.AlterUniqueTogether(
+            name='neuronstimulus',
+            unique_together=set([('neuron', 'experiment', 'time')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='neuronactivity',
+            unique_together=set([('neuron', 'experiment', 'time')]),
+        ),
+        migrations.AlterUniqueTogether(
             name='layer',
             unique_together=set([('experiment', 'name')]),
         ),
         migrations.AlterUniqueTogether(
             name='experiment',
             unique_together=set([('collection', 'name')]),
-        ),
-        migrations.RunSQL(
-            str("CREATE OR REPLACE FUNCTION " +
-            "public.create_partitions() " +
-            "RETURNS TRIGGER AS " +
-            "$BODY$ " +
-            "BEGIN " +
-            " " +
-            "EXECUTE 'CREATE TABLE public.nada_neuron_' || LASTVAL() || ' (CHECK ( experiment_id = ' || LASTVAL() || ')) INHERITS (public.nada_neuron)'; " +
-            "EXECUTE 'CREATE INDEX neurons_layer_id_' || LASTVAL() || ' on public.nada_neuron_' || LASTVAL() || ' USING btree(layer_id)'; " +
-            "EXECUTE 'CREATE INDEX neurons_experiment_id_' || LASTVAL() || ' on public.nada_neuron_' || LASTVAL() || ' USING btree(experiment_id)'; " +
-            "EXECUTE 'CREATE INDEX neurons_geom_' || LASTVAL() || ' on public.nada_neuron_' || LASTVAL() || ' USING gist(geometry gist_geometry_ops_nd)'; " +
-            "EXECUTE 'CREATE INDEX neurons_keypoint_' || LASTVAL() || ' on public.nada_neuron_' || LASTVAL() || ' USING gist(keypoint gist_geometry_ops_nd)'; " +
-            " " +
-            "EXECUTE 'DROP SEQUENCE IF EXISTS public.nada_neuron_to_mesh_' || LASTVAL() || '_id_seq';" +
-            "EXECUTE 'CREATE SEQUENCE public.nada_neuron_to_mesh_' || LASTVAL() || '_id_seq'; " +
-            "EXECUTE 'CREATE TABLE public.nada_neuron_to_mesh_' || LASTVAL() || ' (CHECK ( experiment_id = ' || LASTVAL() || ')) INHERITS (public.nada_neuron_to_mesh)'; " +
-            "EXECUTE 'ALTER TABLE public.nada_neuron_to_mesh_' || LASTVAL() || ' ALTER COLUMN id SET DEFAULT NEXTVAL(' || quote_literal('nada_neuron_to_mesh_' || LASTVAL() || '_id_seq') || ')'; " +
-            "EXECUTE 'CREATE INDEX nada_neuron_to_mesh_' || LASTVAL() || '_id on public.nada_neuron_to_mesh_' || LASTVAL() || ' USING btree(id)'; " +
-            "EXECUTE 'CREATE INDEX nada_neuron_to_mesh_' || LASTVAL() || '_neuron_id on public.nada_neuron_to_mesh_' || LASTVAL() || ' USING btree(neuron_id)'; " +
-            "EXECUTE 'CREATE INDEX nada_neuron_to_mesh_' || LASTVAL() || '_fulltile_id on public.nada_neuron_to_mesh_' || LASTVAL() || ' USING btree(mesh3d_fulltile_id)'; " +
-            " " +
-            "EXECUTE 'CREATE TABLE public.nada_synapse_' || LASTVAL() || ' (CHECK ( experiment_id = ' || LASTVAL() || ')) INHERITS (public.nada_synapse)'; " +
-            "EXECUTE 'CREATE INDEX synapses_layer_id_' || LASTVAL() || ' on public.nada_synapse_' || LASTVAL() || ' USING btree(layer_id)'; " +
-            "EXECUTE 'CREATE INDEX synapses_partner_neuron_id_' || LASTVAL() || ' on public.nada_synapse_' || LASTVAL() || ' USING btree(partner_neuron_id)'; " +
-            "EXECUTE 'CREATE INDEX synapses_experiment_id_' || LASTVAL() || ' on public.nada_synapse_' || LASTVAL() || ' USING btree(experiment_id)'; " +
-            "EXECUTE 'CREATE INDEX synapses_neuron_id_' || LASTVAL() || ' on public.nada_synapse_' || LASTVAL() || ' USING btree(neuron_id)'; " +
-            "EXECUTE 'CREATE INDEX synapses_geometry_' || LASTVAL() || ' on public.nada_synapse_' || LASTVAL() || ' USING gist(geometry gist_geometry_ops_nd)'; " +
-            "EXECUTE 'CREATE INDEX synapses_keypoint_' || LASTVAL() || ' on public.nada_synapse_' || LASTVAL() || ' USING gist(keypoint gist_geometry_ops_nd)'; " +
-            " " +
-            "RETURN NULL; " +
-            "END; " +
-            "$BODY$ " +
-            "LANGUAGE plpgsql;"),
-            "DROP FUNCTION IF EXISTS public.create_partitions();"
-        ),
-        migrations.RunSQL(
-            str("DROP TRIGGER IF EXISTS add_experiment_trigger ON public.nada_experiment; " +
-            "CREATE TRIGGER add_experiment_trigger " +
-            "AFTER INSERT ON public.nada_experiment " +
-            "FOR EACH ROW EXECUTE PROCEDURE public.create_partitions();"),
-            "DROP TRIGGER IF EXISTS add_experiment_trigger ON public.nada_experiment;"
-        ),
-        migrations.RunSQL(
-            str("CREATE OR REPLACE FUNCTION neurons_insert_function() " +
-                "RETURNS TRIGGER AS $$ " +
-                "BEGIN " +
-                "    EXECUTE format('INSERT INTO nada_neuron_' || NEW.experiment_id " +
-                "    || ' (name, cell_type, geometry, keypoint, experiment_id, layer_id) ' " +
-                "    || ' SELECT $1, $2, $3, $4, $5, $6 ' ) " +
-                "    using NEW.name, NEW.cell_type, NEW.geometry::text, NEW.keypoint::text, NEW.experiment_id, NEW.layer_id; " +
-                "    RETURN NULL; " +
-                "END; " +
-                "$$ " +
-                "LANGUAGE plpgsql;"),
-                "DROP FUNCTION IF EXISTS public.neurons_insert_function() CASCADE;"
-        ),
-        migrations.RunSQL(
-            str("DROP TRIGGER IF EXISTS insert_neurons_trigger ON public.nada_neuron; " +
-            "CREATE TRIGGER insert_neurons_trigger " +
-            "BEFORE INSERT ON nada_neuron " +
-            "FOR EACH ROW EXECUTE PROCEDURE neurons_insert_function();"),
-            "DROP TRIGGER IF EXISTS insert_neurons_trigger ON public.nada_neuron;"
-        ),
-        migrations.RunSQL(
-            str("CREATE OR REPLACE FUNCTION synapses_insert_function() " +
-                "RETURNS TRIGGER AS $$ " +
-                "BEGIN " +
-                "    EXECUTE format('INSERT INTO nada_synapse_' || NEW.experiment_id " +
-                "    || ' (name, geometry, keypoint, polarity, compartment, experiment_id, layer_id, neuron_id, partner_neuron_id, partner_synapse_id) ' " +
-                "    || ' SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10' ) " +
-                "    using NEW.name, NEW.geometry::text, NEW.keypoint::text, NEW.polarity, NEW.compartment, NEW.experiment_id, NEW.layer_id, NEW.neuron_id, NEW.partner_neuron_id, NEW.partner_synapse_id; " +
-                "    RETURN NULL; " +
-                "END; " +
-                "$$ " +
-                "LANGUAGE plpgsql;"),
-                "DROP FUNCTION IF EXISTS public.synapses_insert_function() CASCADE;"
-        ),
-        migrations.RunSQL(
-            str("DROP TRIGGER IF EXISTS insert_synapses_trigger ON public.nada_synapse; " +
-            "CREATE TRIGGER insert_synapses_trigger " +
-            "BEFORE INSERT ON nada_synapse " +
-            "FOR EACH ROW EXECUTE PROCEDURE synapses_insert_function();"),
-            "DROP TRIGGER IF EXISTS insert_synapses_trigger ON public.nada_synapse;"
-        ),
-        migrations.RunSQL(
-            str("insert into nada_mesh3d_fulltile(box) " +
-            "select " + 
-            "st_translate(box::geometry, x::float * 2560, y::float * 2160, z::float * 50) " +
-            "from generate_series(0, 10 - 1) as x, " +
-            "generate_series(0, 10 - 1) as y, " +
-            "generate_series(0, 2000 - 1) as z, " +
-            "( " +
-            "select ('MultiPoint(0 0 0, 2560 2160 50)')::geometry as box " +
-            ")as foo;"),
-            "TRUNCATE TABLE nada_mesh3d_fulltile CASCADE;"
-        ),
-        migrations.RunSQL(
-            str("CREATE OR REPLACE FUNCTION neuron_insert_function( " +
-                "    name bigint,  " +
-                "    cell_type integer,  " +
-                "    geometry geometry,  " +
-                "    keypoint geometry,  " +
-                "    experiment_id integer,  " +
-                "    layer_id integer " +
-                ") " +
-                "RETURNS SETOF nada_neuron AS $$ " +
-                "BEGIN " +
-                "    EXECUTE format('INSERT INTO nada_neuron_' || experiment_id  " +
-                "    || ' (name, cell_type, geometry, keypoint, experiment_id, layer_id) '  " +
-                "    || ' SELECT $1, $2, $3, $4, $5, $6 ' ) " +
-                "    USING name, cell_type, geometry::text, keypoint::text, experiment_id, layer_id;  " +
-                " " +                
-                "   EXECUTE format('INSERT INTO nada_neuron_to_mesh_'|| experiment_id  " +
-                "   || ' (neuron_id, experiment_id, mesh3d_fulltile_id) '  " +
-                "   || ' SELECT $1, '  " +
-                "   || ' $2, '  " +
-                "   || ' nada_mesh3d_fulltile.id '  " +
-                "   || ' FROM nada_mesh3d_fulltile WHERE $3 &&& nada_mesh3d_fulltile.box;')  " +
-                "   USING CURRVAL('nada_neuron_id_seq'::regclass), experiment_id, geometry::text;   " +
-                " " +
-                "    RETURN QUERY " +
-                "        EXECUTE format('SELECT * FROM nada_neuron_' || experiment_id || ' WHERE id = ' || CURRVAL('nada_neuron_id_seq'::regclass)); " +
-                "    RETURN; " +
-                "END; " +
-                "$$ " +
-                "LANGUAGE plpgsql;"),
-            "DROP FUNCTION IF EXISTS neuron_insert(bigint,integer,geometry,geometry,integer,integer) CASCADE;;"
-        ),
-        migrations.RunSQL(
-            str("CREATE OR REPLACE FUNCTION synapse_insert_function( " +
-                "   name bigint,  " +
-                "   geometry geometry,  " +
-                "   keypoint geometry,  " +
-                "   polarity integer,  " +
-                "   compartment double precision,  " +
-                "   experiment_id integer,  " +
-                "   layer_id integer,  " +
-                "   neuron_id integer,  " +
-                "   partner_neuron_id integer,  " +
-                "   partner_synapse_id integer " +
-                ") " +
-                "RETURNS SETOF nada_synapse AS $$ " +
-                "BEGIN " +
-                "    EXECUTE format('INSERT INTO nada_synapse_' || experiment_id  " +
-                "    || ' (name, geometry, keypoint, polarity, compartment, experiment_id, layer_id, neuron_id, partner_neuron_id, partner_synapse_id) '  " +
-                "    || ' SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10' ) " +
-                "    using name, geometry::text, keypoint::text, polarity, compartment, experiment_id, layer_id, neuron_id, partner_neuron_id, partner_synapse_id;  " +
-                "    RETURN QUERY " +
-                "        EXECUTE format('SELECT * FROM nada_synapse_' || experiment_id || ' WHERE id = ' || CURRVAL('nada_synapse_id_seq'::regclass)); " +
-                "    RETURN; " +
-                "END; " +
-                "$$ " +
-                "LANGUAGE plpgsql;"),
-            "DROP FUNCTION IF EXISTS synapse_insert_function(bigint,geometry,geometry,integer,double precision,integer,integer,integer,integer,integer) CASCADE;"
         ),
     ]

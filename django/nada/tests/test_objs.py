@@ -6,10 +6,12 @@ from nada.fixtures import is_empty, nuke_all, boss_setup, neurons_setup, BOSS_CL
 import unittest
 
 class FixturesTestCase(APITestCase):
-    
-    def setUp(self):
-        self.assertTrue(is_empty(BOSS_CLASSES))
-        self.assertTrue(is_empty(BOSS_CLASSES))
+
+    @classmethod
+    def setUpClass(cls):
+        '''Initialized once, before any class tests are run'''
+        cls.assertTrue(cls, is_empty(BOSS_CLASSES))
+        cls.assertTrue(cls, is_empty(BOSS_CLASSES))
         boss_setup()
         neurons_setup(**NEURONS_TEST_OPTIONS)
         
@@ -35,14 +37,23 @@ class FixturesTestCase(APITestCase):
             self.assertIsNotNone(synapse.experiment)
             self.assertIsNotNone(synapse.layer)
             self.assertIsNotNone(synapse.neuron)
+            self.assertIsNotNone(synapse.partner_synapse)
             self.assertEquals(synapse.layer.name, 'layer2')
             self.assertIn(synapse, synapse.neuron.synapses.all())
             self.assertEquals(synapse, synapse.partner_synapse.partner_synapse)
             self.assertEquals(synapse.neuron, synapse.partner_synapse.partner_neuron)
 
-    def tearDown(self):
+    def test_neuron_activity(self):
+        for neuron in nada.models.Neuron.objects.all():
+            na_activity = nada.models.NeuronActivity.get_by_time(neuron.experiment, neuron, 0, 1000)
+            n_activity = neuron.activity.all()
+            self.assertEquals(len(na_activity), len(n_activity))
+            self.assertEquals(NEURONS_TEST_OPTIONS['N_ACTIVITY_ENTRIES'], len(n_activity))
+
+    @classmethod
+    def tearDownClass(cls):
         nuke_all(NEURONS_CLASSES)
-        self.assertTrue(is_empty(NEURONS_CLASSES))
+        cls.assertTrue(cls, is_empty(NEURONS_CLASSES))
         nuke_all(BOSS_CLASSES)
-        self.assertTrue(is_empty(BOSS_CLASSES))
+        cls.assertTrue(cls, is_empty(BOSS_CLASSES))
 

@@ -1,6 +1,7 @@
 import random
 from . import boss
-from ..models import Neuron, Synapse, Layer, Polarity, CellType, Compartment
+from ..models import Neuron, Synapse, Layer, Polarity, CellType, Compartment, \
+     NeuronStimulus, NeuronActivity
 from django.contrib.gis.geos import Point, MultiPoint
 
 NEURONS_CLASSES = [Neuron, Synapse]
@@ -19,13 +20,17 @@ NEURONS_CLASSES = [Neuron, Synapse]
 NEURONS_DEFAULT_OPTIONS = { 'N_NEURONS' : 500,
                             'POINTS_PER_NEURON' : 500,
                             'N_SYNAPSES' : 1000,
-                            'POINTS_PER_SYNAPSE' : 50
+                            'POINTS_PER_SYNAPSE' : 50,
+                            'N_STIMULUS_ENTRIES' : 100,
+                            'N_ACTIVITY_ENTRIES' : 100,
                             }
 
 NEURONS_TEST_OPTIONS = { 'N_NEURONS' : 50,
                          'POINTS_PER_NEURON' : 50,
                          'N_SYNAPSES' : 100,
-                         'POINTS_PER_SYNAPSE' : 5
+                         'POINTS_PER_SYNAPSE' : 5,
+                         'N_STIMULUS_ENTRIES' : 10,
+                         'N_ACTIVITY_ENTRIES' : 10,
                          }
 
 def neurons_setup(**options):
@@ -33,8 +38,6 @@ def neurons_setup(**options):
     layer1 = Layer.get_by_name('layer1')  # neurons
     layer2 = Layer.get_by_name('layer2')  # synapses
     experiment1 = layer1.experiment
-
-
     neurons = []
     synapses = []
 
@@ -55,27 +58,20 @@ def neurons_setup(**options):
             else:
                 neuron.cell_type = CellType.inhibitory
         neuron.save()
+        define_stimulus_and_activity(neuron, options)
 
     assert(len(neurons) == options['N_NEURONS'])
     for synapse_id in range(0, options['N_SYNAPSES']):
-        random_neuron = neurons[random.randrange(0, options['N_NEURONS'])]
-        synapse = Synapse(name=synapse_id,
-                          layer=layer2,
-                          experiment=experiment1,
-                          neuron=random_neuron,
-                          compartment=random.random())
+        synapse = create_synapse(synapse_id, neurons, \
+                                 layer=layer2, experiment=experiment1, options=options)
         synapses.append(synapse)
-        center_y = random.randrange(2000)
-        center_z = random.randrange(2000)
-        pts = [Point(synapse_id + random.randrange(-100, 100), 
-                     center_y + random.randrange(-100, 100), 
-                     center_z + random.randrange(-100, 100)) \
-               for p in range(0, options['POINTS_PER_SYNAPSE'])]
-        synapse.geometry = MultiPoint(pts)
-        synapse.keypoint = Point(synapse_id, center_y, center_z) # synapse.geometry.centroid is 2D
-        max_compartment_value = (Compartment.axon.value + 1) # axon == 5
-        synapse.compartment = Compartment(synapse_id % max_compartment_value) # assign value between 0-5
+    assert(len(synapses) == options['N_SYNAPSES'])        
+    match_synapses(synapses)
         
+def match_synapses(synapses):
+    '''
+    Assign pairs of synapses to each other
+    '''
     while len(synapses)>0:
         synapse = synapses[0]
         if synapse.partner_synapse == None:
@@ -96,6 +92,37 @@ def neurons_setup(**options):
             partner.save()
             synapses.remove(synapse)
             synapses.remove(partner)
+
+def create_synapse(synapse_id, neurons, layer, experiment, options):
+    random_neuron = neurons[random.randrange(0, options['N_NEURONS'])]
+    synapse = Synapse(name=synapse_id,
+                      layer=layer,
+                      experiment=experiment,
+                      neuron=random_neuron,
+                      compartment=random.random())
+    center_y = random.randrange(2000)
+    center_z = random.randrange(2000)
+    pts = [Point(synapse_id + random.randrange(-100, 100), 
+                 center_y + random.randrange(-100, 100), 
+                 center_z + random.randrange(-100, 100)) \
+           for p in range(0, options['POINTS_PER_SYNAPSE'])]
+    synapse.geometry = MultiPoint(pts)
+    synapse.keypoint = Point(synapse_id, center_y, center_z) # synapse.geometry.centroid is 2D
+    max_compartment_value = (Compartment.axon.value + 1) # axon == 5
+    synapse.compartment = Compartment(synapse_id % max_compartment_value) # assign value between 0-5
+    return synapse
+
+def define_stimulus_and_activity(neuron, options):
+    exp = neuron.experiment
+    for time in range(0,options['N_STIMULUS_ENTRIES']):
+        value = random.randrange(-10, 10)
+        s = NeuronStimulus(neuron=neuron, experiment=exp, time=time, value=value)
+        s.save()
+    for time in range(0,options['N_ACTIVITY_ENTRIES']):
+        value = random.random()
+        a = NeuronActivity(neuron=neuron, experiment=exp, time=time, value=value)
+        a.save()
+        #print('**a', a, neuron.name, exp, time, value)
 
 def choose_partner(synapse, others):
     '''

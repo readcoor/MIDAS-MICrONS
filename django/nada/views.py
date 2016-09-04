@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Neuron, Synapse, Compartment, CellType
+from .models import Neuron, Synapse, Compartment, CellType, NeuronStimulus, NeuronActivity
 from .boss_client import BossClient
 
 from psycopg2.extensions import adapt as esc
@@ -201,7 +201,7 @@ def voxel_list_remote(request, collection, experiment, layer,  resolution,
     return Response(result.raw, status=status.HTTP_200_OK)
 
 
-# SA1
+# S10
 @api_view(['GET'])
 def synapse_compartment(request, collection, experiment, layer,  id):
     synapse = Synapse.get_obj_or_400(collection, experiment, layer, id)
@@ -210,11 +210,39 @@ def synapse_compartment(request, collection, experiment, layer,  id):
     result = { "compartment": Compartment(synapse.compartment).name }
     return Response(result, status=status.HTTP_200_OK)
 
-# SA2
+# S11
 @api_view(['GET'])
 def neuron_celltype(request, collection, experiment, layer,  id):
     neuron= Neuron.get_obj_or_400(collection, experiment, layer, id)
     if isinstance(neuron, Response):
         return neuron  # return HTTP_400 response
     result = { "cell_type": CellType(neuron.cell_type).name }
+    return Response(result, status=status.HTTP_200_OK)
+
+# S12
+@api_view(['GET'])
+def neuron_stimulus(request, collection, experiment, layer,  id, start_time, end_time):
+    neuron = Neuron.get_obj_or_400(collection, experiment, layer, id)
+    if isinstance(neuron, Response):
+        return neuron  # return HTTP_400 response
+    series = NeuronStimulus.get_by_time(neuron.experiment, neuron, start_time, end_time)
+    if len(series) == 0:
+        err_msg = "No values found for (%s <= time < %s) on neuron %s " % \
+                  (start_time, end_time, id)
+        return Response(err_msg, status.HTTP_400_BAD_REQUEST)
+    result = { "stimulus": [(ns.time, ns.value) for ns in series] }
+    return Response(result, status=status.HTTP_200_OK)
+
+# S13
+@api_view(['GET'])
+def neuron_activity(request, collection, experiment, layer, id, start_time, end_time):
+    neuron = Neuron.get_obj_or_400(collection, experiment, layer, id)
+    if isinstance(neuron, Response):
+        return neuron  # return HTTP_400 response
+    series = NeuronActivity.get_by_time(neuron.experiment, neuron, start_time, end_time)
+    if len(series) == 0:
+        err_msg = "No values found for (%s <= time < %s) on neuron %s " % \
+                  (start_time, end_time, id)
+        return Response(err_msg, status.HTTP_400_BAD_REQUEST)
+    result = { "activity": [(na.time, na.value) for na in series] }
     return Response(result, status=status.HTTP_200_OK)

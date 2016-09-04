@@ -83,7 +83,7 @@ class TimeSeriesMixin:
                .filter(time=time) \
                .get()
 
-class Neuron(NameLookupMixin, CELIMixin, models.Model):
+class Neuron(models.Model):
     """
     Object representing a Neuron
     """
@@ -94,7 +94,7 @@ class Neuron(NameLookupMixin, CELIMixin, models.Model):
     geometry = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False) # [Point(x,y,z)...]
     keypoint = gis_models.PointField(dim=3, srid=0, spatial_index=False) # Point(x,y,z)
 
-class Mesh3D_FullTile(NameLookupMixin, CELIMixin, models.Model):
+class Mesh3D_FullTile(models.Model):
     """
     A mesh of tile sized (2560, 2160, 50) rectangles
     """

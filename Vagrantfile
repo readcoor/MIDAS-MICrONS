@@ -36,9 +36,4 @@ Vagrant.configure(2) do |config|
       path: "bootstrap.sh", 
       privileged: true
 
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Need to enable this to work around SSH bug
-  #   vb.gui = true
-  # end
-
 end

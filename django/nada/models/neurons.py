@@ -101,7 +101,7 @@ class Mesh3D_FullTile(models.Model):
     box = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False)
 
 
-class Neuron_To_Mesh(NameLookupMixin, CELIMixin, models.Model):
+class Neuron_To_Mesh(models.Model):
     """
     Join table that links Neurons to the Mesh table for optimizing queries
     """

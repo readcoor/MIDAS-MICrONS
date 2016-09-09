@@ -83,7 +83,7 @@ class TimeSeriesMixin:
                .filter(time=time) \
                .get()
 
-class Neuron(models.Model):
+class Neuron(NameLookupMixin, CELIMixin, models.Model):
     """
     Object representing a Neuron
     """

@@ -94,6 +94,22 @@ class Neuron(NameLookupMixin, CELIMixin, models.Model):
     geometry = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False) # [Point(x,y,z)...]
     keypoint = gis_models.PointField(dim=3, srid=0, spatial_index=False) # Point(x,y,z)
 
+class Mesh3D_FullTile(models.Model):
+    """
+    A mesh of tile sized (2560, 2160, 50) rectangles
+    """
+    box = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False)
+
+
+class Neuron_To_Mesh(models.Model):
+    """
+    Join table that links Neurons to the Mesh table for optimizing queries
+    """
+    experiment = models.ForeignKey(Experiment, related_name='neuron_to_mesh', on_delete=models.CASCADE)
+    neuron = models.ForeignKey(Neuron, related_name='neuron_to_mesh', on_delete=models.CASCADE)    
+    mesh3d_fulltile = models.ForeignKey(Mesh3D_FullTile, related_name='neuron_to_mesh')
+
+
 class Synapse(NameLookupMixin, CELIMixin, models.Model):
     """
     Object representing a Synapse

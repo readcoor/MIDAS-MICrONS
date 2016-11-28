@@ -25,6 +25,7 @@ This section describes the ranges of example values used to populate the demo si
 |  neuron keypoint’s y or z-coordinate | 0-2000 (randomized)   |
 |synapse keypoint’s x-coordinate | 0-1000 (assigned to be same as synapse ID) |
 |synapse keypoint’s y or z-coordinate | 0-2000 (randomized) |
+{: .table .table-striped}
 
 ## API Examples you can try:
 This sections gives specific examples of API URLs you can try on the demo site, using dummy data in both the request parameters and the responses.

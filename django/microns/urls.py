@@ -20,7 +20,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic import RedirectView, TemplateView
 from .views import schema_view
 
-homepage_view = RedirectView.as_view(url='https://wyssmicrons.github.io/MIDAS-MICrONS/', permanent=True))
+homepage_view = RedirectView.as_view(url='https://wyssmicrons.github.io/MIDAS-MICrONS/', permanent=True)
 favicon_view  = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 
 urlpatterns = [

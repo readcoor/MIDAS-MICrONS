@@ -36,6 +36,7 @@ You many wish to append “?format=json” to each request. We can also configur
 For example:
 
 [`http://api-nda.us-east-1.elasticbeanstalk.com/is_synapse/collection1/experiment1/layer2/34?format=json`](http://api-nda.us-east-1.elasticbeanstalk.com/is_synapse/collection1/experiment1/layer2/34?format=json)
+
 ```json
 => { "result": true }   // returns bare-bones json
 ```
@@ -94,42 +95,56 @@ For example:
 ```
 
 [`http://api-nda.us-east-1.elasticbeanstalk.com/is_neuron/collection1/experiment1/layer1/9999`](http://api-nda.us-east-1.elasticbeanstalk.com/is_neuron/collection1/experiment1/layer1/9999)
+
 ```json
 => HTTP 400: Not found error
 ```
+
 ### S6: neuron_ids
 [`http://api-nda.us-east-1.elasticbeanstalk.com/neuron_ids/collection1/experiment1/layer1/0/0,50/0,2000/0,2000`](http://api-nda.us-east-1.elasticbeanstalk.com/neuron_ids/collection1/experiment1/layer1/0/0,50/0,2000/0,2000)
+
 ```json
 => { "ids": [0, ...50] }
 ```
+
 ### S7: neuron_keypoint
 [`http://api-nda.us-east-1.elasticbeanstalk.com/neuron_keypoint/collection1/experiment1/layer1/0/33`](http://api-nda.us-east-1.elasticbeanstalk.com/neuron_keypoint/collection1/experiment1/layer1/0/33)
+
 ```json
 => { "keypoint":  [ 33.0, 387.0, 1190.0 ] }
 ```
+
 ### S8: neuron_children
 [`http://api-nda.us-east-1.elasticbeanstalk.com/neuron_children/collection1/experiment1/layer1/0/0,50/0,2000/0,2000/37`](http://api-nda.us-east-1.elasticbeanstalk.com/neuron_children/collection1/experiment1/layer1/0/0,50/0,2000/0,2000/37)
+
 ```json
 => { "child_synapses": { "96": 2, "541": 1 } }
 ```
+
 ### S9: voxel_list
 [`http://api-nda.us-east-1.elasticbeanstalk.com/voxel_list/collection1/experiment1/layer1/0/0,50/0,2000/0,2000/23`](http://api-nda.us-east-1.elasticbeanstalk.com/voxel_list/collection1/experiment1/layer1/0/0,50/0,2000/0,2000/23)
+
 ```json
 => { "x": [ 62.0,14.0… ], "y": [ 1192.0,1036.0… ], "z": [ 1592.0,1602.0… ]}
 ```
+
 ### S10: synapse_compartment
 [`http://api-nda.us-east-1.elasticbeanstalk.com/synapse_compartment/collection1/experiment1/layer2/55`](http://api-nda.us-east-1.elasticbeanstalk.com/synapse_compartment/collection1/experiment1/layer2/55)
+
 ```json
 => { "compartment": "soma" }
 ```
+
 ### S11: neuron_celltype
 [`http://api-nda.us-east-1.elasticbeanstalk.com/neuron_celltype/collection1/experiment1/layer1/66`](http://api-nda.us-east-1.elasticbeanstalk.com/neuron_celltype/collection1/experiment1/layer1/66)
+
 ```json
 => { "cell_type": "excitatory" }
 ```
 
 ### S12: neuron_stimulus
 [`http://api-nda.us-east-1.elasticbeanstalk.com/neuron_stimulus/collection1/experiment1/layer1/73/0,25`](http://api-nda.us-east-1.elasticbeanstalk.com/neuron_stimulus/collection1/experiment1/layer1/73/0,25)
+
 ```json
 =>  { "stimulus": [ [ 0, 3 ],  [ 1, 8 ], … ] }
 ```
@@ -137,6 +152,7 @@ For example:
 
 ### S13: neuron_activity
 [`http://api-nda.us-east-1.elasticbeanstalk.com/neuron_activity/collection1/experiment1/layer1/36/0,25`](http://api-nda.us-east-1.elasticbeanstalk.com/neuron_activity/collection1/experiment1/layer1/36/0,25)
+
 ```json
 =>  { "activity": [[ 0, 0.858960732532459 ], [ 1, 0.0411693150537612 ], … ] }
 ```

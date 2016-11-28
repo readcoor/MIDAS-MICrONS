@@ -54,16 +54,19 @@ For example:
 ```json
 => HTTP 400: Not found error
 ```
+
 ### S2: synapse_ids
 [`http://api-nda.us-east-1.elasticbeanstalk.com/synapse_ids/collection1/experiment1/layer2/0/0,50/0,2000/0,2000`](http://api-nda.us-east-1.elasticbeanstalk.com/synapse_ids/collection1/experiment1/layer2/0/0,50/0,2000/0,2000)
 ```json
 => { "ids": [0, ..., 50] }
 ```
+
 ### S3: synapse_keypoint
 [`http://api-nda.us-east-1.elasticbeanstalk.com/synapse_keypoint/collection1/experiment1/layer2/0/33`](http://api-nda.us-east-1.elasticbeanstalk.com/synapse_keypoint/collection1/experiment1/layer2/0/33)
 ```json
 => { "keypoint":  [ 33.0, 1137.0, 1802.0] }
 ```
+
 ### S4: synapse_parent
 [`http://api-nda.us-east-1.elasticbeanstalk.com/synapse_parent/collection1/experiment1/layer2/47`](http://api-nda.us-east-1.elasticbeanstalk.com/synapse_parent/collection1/experiment1/layer2/47)
 ```json

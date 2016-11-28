@@ -5,8 +5,8 @@ layout: default
 
 ### Documentation
 
-* [Interactive API documentation](docs) for this django API server
+* [Interactive API documentation](http://api-nda.us-east-1.elasticbeanstalk.com/docs/) for this django API server
 * [theboss.io](http://theboss.io)
-* [Github source](Github source)
+* [Github source](https://github.com/WyssMICrONS/MIDAS-MICrONS)
 
 

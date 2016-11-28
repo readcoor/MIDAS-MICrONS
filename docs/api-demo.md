@@ -42,45 +42,57 @@ For example:
 
 ### S1: is_synapse
 [`http://api-nda.us-east-1.elasticbeanstalk.com/is_synapse/collection1/experiment1/layer2/34`](http://api-nda.us-east-1.elasticbeanstalk.com/is_synapse/collection1/experiment1/layer2/34)
+
 ```json
 => { "result": true }
 ```
 
 [`http://api-nda.us-east-1.elasticbeanstalk.com/is_synapse/collection1/experiment1/layer1/34`](http://api-nda.us-east-1.elasticbeanstalk.com/is_synapse/collection1/experiment1/layer1/34)
+
 ```json
 => { "result": false }  // references a neuron, not a synapse
 ```
+
 [`http://api-nda.us-east-1.elasticbeanstalk.com/is_synapse/collection1/experiment1/layer2/9999`](http://api-nda.us-east-1.elasticbeanstalk.com/is_synapse/collection1/experiment1/layer2/9999)
+
 ```json
 => HTTP 400: Not found error
 ```
 
 ### S2: synapse_ids
 [`http://api-nda.us-east-1.elasticbeanstalk.com/synapse_ids/collection1/experiment1/layer2/0/0,50/0,2000/0,2000`](http://api-nda.us-east-1.elasticbeanstalk.com/synapse_ids/collection1/experiment1/layer2/0/0,50/0,2000/0,2000)
+
 ```json
 => { "ids": [0, ..., 50] }
 ```
 
 ### S3: synapse_keypoint
 [`http://api-nda.us-east-1.elasticbeanstalk.com/synapse_keypoint/collection1/experiment1/layer2/0/33`](http://api-nda.us-east-1.elasticbeanstalk.com/synapse_keypoint/collection1/experiment1/layer2/0/33)
+
 ```json
 => { "keypoint":  [ 33.0, 1137.0, 1802.0] }
 ```
 
 ### S4: synapse_parent
 [`http://api-nda.us-east-1.elasticbeanstalk.com/synapse_parent/collection1/experiment1/layer2/47`](http://api-nda.us-east-1.elasticbeanstalk.com/synapse_parent/collection1/experiment1/layer2/47)
+
 ```json
 => { "parent_neurons": { "452": 2, "206": 1 } }
 ```
+
 ### S5: is_neuron
 [`http://api-nda.us-east-1.elasticbeanstalk.com/is_neuron/collection1/experiment1/layer1/34`](http://api-nda.us-east-1.elasticbeanstalk.com/is_neuron/collection1/experiment1/layer1/34)
+
 ```json
 => { "result": true }
 ```
+
 [`http://api-nda.us-east-1.elasticbeanstalk.com/is_neuron/collection1/experiment1/layer2/34`](http://api-nda.us-east-1.elasticbeanstalk.com/is_neuron/collection1/experiment1/layer2/34)
+
 ```json
 => { "result": false }   // references a synapse, not a neuron
 ```
+
 [`http://api-nda.us-east-1.elasticbeanstalk.com/is_neuron/collection1/experiment1/layer1/9999`](http://api-nda.us-east-1.elasticbeanstalk.com/is_neuron/collection1/experiment1/layer1/9999)
 ```json
 => HTTP 400: Not found error

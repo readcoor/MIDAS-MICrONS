@@ -8,7 +8,7 @@ layout: default
 This document describes how to demo the abilities of the NDA API using the dummy data on the demo site. 
 
 ## Demo site:
-To find REST parameter documentation for all NDA API endpoints, visit this page:
+To find REST parameter documentation for all NDA API endpoints, visit this page:  
 [`http://api-nda.us-east-1.elasticbeanstalk.com/docs/`](http://api-nda.us-east-1.elasticbeanstalk.com/docs/)
 
 ## Example values:

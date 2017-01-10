@@ -16,6 +16,7 @@ yum -y update
 # Install basic stuff
 yum -y install curl git unzip ntp emacs-nox libcurl-devel binutils gcc gcc-c++ epel-release
 yum -y install python34 python34-devel 
+yum -y install openssl-devel
 
 # Install geography libraries
 yum -y install gdal-devel gdal geos 
@@ -42,7 +43,4 @@ python3 get-pip.py
 rm get-pip.py
 
 # install python libraries
-pip install virtualenv awsebcli django django-rest-swagger
-pip install markdown psycopg2 numpy blosc
-
 pip install -r /home/vagrant/sync/django/requirements.txt

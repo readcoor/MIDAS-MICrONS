@@ -16,8 +16,8 @@ Vagrant.configure(2) do |config|
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 8000 on the guest machine.
-  config.vm.network :forwarded_port, guest: 8000, host: 8080
+  # accessing "localhost:8000" will access port 8000 on the guest machine.
+  config.vm.network :forwarded_port, guest: 8000, host: 8000
   config.vm.network :forwarded_port, guest: 5432, host: 5432
 
   # Share an additional folder to the guest VM. The first argument is
@@ -25,8 +25,8 @@ Vagrant.configure(2) do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-  config.vm.synced_folder '.', '/home/vagrant/sync', disabled: true
-  config.vm.synced_folder '.', '/vagrant', disabled: false
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.synced_folder '.', '/home/vagrant/sync', disabled: false
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the

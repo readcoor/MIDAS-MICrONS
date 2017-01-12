@@ -40,7 +40,8 @@ class TheBossTestCase(unittest.TestCase):
         fixtures = cls.fixtures
         for resource_name in ['ann_channel', 'channel', 'experiment', 'collection', 'coordframe']:
             boss.delete_project(fixtures[resource_name])
-
+        cls.assertNotIn(cls, COLLECTION, boss.list_collections())
+        cls.assertNotIn(cls, COORD_FRAME, boss.list_coordinate_frames())
 
     def test_config_file(self):
         'confirm we have a config file for TheBoss'
@@ -49,6 +50,10 @@ class TheBossTestCase(unittest.TestCase):
     def test_collections(self):
         collections = self.boss.list_collections()
         self.assertIn(COLLECTION, collections)
+
+    def test_coord_frames(self):
+        coord_frames = self.boss.list_coordinate_frames()
+        self.assertIn(COORD_FRAME, coord_frames)
         
     def test_experiments(self):
         experiments = self.boss.list_experiments(COLLECTION)

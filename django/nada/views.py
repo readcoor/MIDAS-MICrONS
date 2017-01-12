@@ -2,7 +2,6 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Neuron, Synapse, Compartment, CellType, NeuronStimulus, NeuronActivity
-from .boss_client import BossClient
 
 from psycopg2.extensions import adapt as esc
 
@@ -187,18 +186,19 @@ def voxel_list(request, collection, experiment, layer,  resolution,
                "z": coords[2] }
     return Response(result, status=status.HTTP_200_OK)
 
-
+# TODO: rewrite using intern remote-call package
+#
 # S9 - proxy call to theboss.io
-@api_view(['GET'])
-def voxel_list_remote(request, collection, experiment, layer,  resolution,
-               x_start, x_stop,
-               y_start, y_stop,
-               z_start, z_stop, id):
-    # Proxy call to theboss.io
-    boss = BossClient()
-    # Dummy placeholder - Need voxels instead
-    result = boss.get_layer(layer, collection, experiment)
-    return Response(result.raw, status=status.HTTP_200_OK)
+#@api_view(['GET'])
+#def voxel_list_remote(request, collection, experiment, layer,  resolution,
+#               x_start, x_stop,
+#               y_start, y_stop,
+#               z_start, z_stop, id):
+#    # Proxy call to theboss.io
+#    boss = BossClient()
+#    # Dummy placeholder - Need voxels instead
+#    result = boss.get_layer(layer, collection, experiment)
+#    return Response(result.raw, status=status.HTTP_200_OK)
 
 
 # S10

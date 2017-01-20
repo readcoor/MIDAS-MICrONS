@@ -105,15 +105,7 @@ SQLITE_DATABASES = {
 }
 
 # Use sqlite on dev machine. Use postgres for production
-if 'DJANGO_DEV' in os.environ:
-    DATABASES = {'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'microns',
-        'USER': 'tester',
-        'PASSWORD': 'test_password',
-        'HOST': 'localhost',
-        'PORT': ''}}
-else:
+if 'RDS_DB_NAME' in os.environ:
     DATABASES = {'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ['RDS_DB_NAME'],
@@ -122,7 +114,15 @@ else:
         'HOST': os.environ['RDS_HOSTNAME'],
         'PORT': os.environ['RDS_PORT'],
     }}
-    
+else:
+    DATABASES = {'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'microns',
+        'USER': 'tester',
+        'PASSWORD': 'test_password',
+        'HOST': 'localhost',
+        'PORT': ''
+    }}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -160,7 +160,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, '..', 'www', 'static')
 STATIC_URL = '/static/'
 
 API_VERSION = 'v1'

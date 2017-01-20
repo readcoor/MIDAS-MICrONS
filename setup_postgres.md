@@ -1,15 +1,10 @@
 # First-time setup of postgres database in a development vm
 
-For dev credential declarations, see `DATABASES` inside `django/microns/settings.py`. 
-
-On your dev machine, `.bashrc` should set the dev flag:  
-~~~bash
-export DJANGO_DEV=1
-~~~
-
 Production values are stored in environment variables: `RDS_DB_NAME, RDS_USERNAME, RDS_PASSWORD, RDS_HOSTNAME, RDS_PORT.`
 
-## Set up `tester` user and `microns` database.
+For dev credentials, see `DATABASES` inside `django/microns/settings.py`. 
+
+## Set up dev environment with `tester` user and `microns` database.
 
 User `postgres` may not have access to current directory. If so, `cd /tmp` first before trying this.
 

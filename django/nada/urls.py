@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import include, url
 from . import views
 
 
@@ -10,7 +10,8 @@ def param(name):
 def params(*names):
     return '/'.join([param(name) for name in names])
 
-urlpatterns = [ 
+urlpatterns = [
+    url(r'^openid/', include('djangooidc.urls')),
     url(r'^is_synapse/' + params('collection', 'experiment', 'layer', 'id') + r'/?$',
         views.is_synapse, name='is_synapse'),
     url(r'^is_neuron/' + params('collection', 'experiment', 'layer', 'id') + r'/?$',

@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'h3b6id_c(2%#_949y7l6yrn+wjm8-2g4z#($4uobqax)@cs(h('
+SECRET_KEY = '<secret key>'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,8 +41,26 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'nada',
     'rest_framework',
-    'rest_framework_swagger'
+    'rest_framework_swagger',
+    'bossoidc',
+    'djangooidc'
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'bossoidc.backend.OpenIdConnectBackend'
+    ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+    'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+    # ...
+    'rest_framework.authentication.SessionAuthentication',
+    'oidc_auth.authentication.BearerTokenAuthentication',
+    )
+    }
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -148,3 +166,13 @@ STATIC_URL = '/static/'
 API_VERSION = 'v1'
 
 THEBOSS_CONFIG = os.path.join(BASE_DIR, 'theboss.cfg')
+
+auth_uri = "https://auth.theboss.io/auth/realms/BOSS"
+client_id = "church" # Client ID configured in the Auth Server
+
+public_uri = "http://localhost:8080/home" # The address that the client will be redirected back to
+                                     # NOTE: the public uri needs to be configured in the Auth Server
+                                     #       as a valid uri to redirect to
+
+from bossoidc.settings import *
+configure_oidc(auth_uri, client_id, public_uri)

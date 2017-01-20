@@ -27,6 +27,13 @@ yum -y install postgis2_94 postgis2_94-devel postgresql94-server postgresql94-de
 #yum -y install postgresql94-server postgresql94-devel postgresql-contrib 
 #yum -y install postgresql-devel
 
+# Create docker group
+sudo groupadd docker
+# Add user 'vagrant' to group 'docker'
+usermod -aG docker $(whoami)
+# Restart docker on reboot
+systemctl enable docker
+
 # needed for pip install psycopg2
 ln -s /usr/pgsql-9.4/bin/pg_config /usr/bin/pg_config
 

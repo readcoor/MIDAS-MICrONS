@@ -180,7 +180,7 @@ client_id = "church" # Client ID configured in the Auth Server
 # NOTE: the public uri needs to be configured in the Auth Server
 #       as a valid uri to redirect to
 if 'IS_PRODUCTION' in os.environ:
-    public_uri = 'http://%s/home' % os.environ['HTTP_HOST']
+    public_uri = 'http://%s/home' % os.environ['ALLOWED_HOST']
 else:
     public_uri = "http://localhost:8080/home" 
 

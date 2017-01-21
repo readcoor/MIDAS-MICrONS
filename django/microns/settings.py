@@ -176,9 +176,14 @@ THEBOSS_CONFIG = os.path.join(BASE_DIR, 'theboss.cfg')
 auth_uri = "https://auth.theboss.io/auth/realms/BOSS"
 client_id = "church" # Client ID configured in the Auth Server
 
-public_uri = "http://localhost:8080/home" # The address that the client will be redirected back to
-                                     # NOTE: the public uri needs to be configured in the Auth Server
-                                     #       as a valid uri to redirect to
+# public_uri: the address that the client will be redirected back to
+# NOTE: the public uri needs to be configured in the Auth Server
+#       as a valid uri to redirect to
+if 'IS_PRODUCTION' in os.environ:
+    public_uri = 'http://%s/home' % os.environ['HTTP_HOST']
+else:
+    public_uri = "http://localhost:8080/home" 
+
 
 from bossoidc.settings import *
 configure_oidc(auth_uri, client_id, public_uri)

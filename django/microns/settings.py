@@ -180,10 +180,9 @@ client_id = "church" # Client ID configured in the Auth Server
 # NOTE: the public uri needs to be configured in the Auth Server
 #       as a valid uri to redirect to
 if 'IS_PRODUCTION' in os.environ:
-    public_uri = 'http://%s/home' % os.environ['ALLOWED_HOST']
+    public_uri = 'https://%s/docs' % os.environ['ALLOWED_HOST']
 else:
-    public_uri = "http://localhost:8080/home" 
-
+    public_uri = "http://localhost:8080/docs" 
 
 from bossoidc.settings import *
 configure_oidc(auth_uri, client_id, public_uri)

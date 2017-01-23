@@ -173,6 +173,8 @@ API_VERSION = 'v1'
 
 THEBOSS_CONFIG = os.path.join(BASE_DIR, 'theboss.cfg')
 
+LOGOUT_URL = 'https://api.theboss.io/openid/logout'
+
 auth_uri = "https://auth.theboss.io/auth/realms/BOSS"
 client_id = "church" # Client ID configured in the Auth Server
 
@@ -187,6 +189,3 @@ else:
 from bossoidc.settings import *
 configure_oidc(auth_uri, client_id, public_uri)
 
-print('**** ENV ****', os.environ)
-
-print('**** DATABASES ****', DATABASES)

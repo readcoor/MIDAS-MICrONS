@@ -14,6 +14,9 @@ def schema_view(request):
     return response.Response(full_schema.delete('docs'))
 
 
-def index(request, state=None):
-    return HttpResponse("Hello, world. You're home. state=%s" % state)
+def index(request):
+    return HttpResponse('<p>Hello, world.</P> <P>View the API <a href="/docs">here</a></P>')
 
+def health_check(request):
+    '''Return 200 to tell Elastic Beanstalk that everything is ok'''
+    return HttpResponse('System health appears to be ok')

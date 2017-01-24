@@ -33,7 +33,10 @@ if 'DEBUG' in os.environ:
 else:
     DEBUG = True
 
-ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST', '')]
+if 'ALLOWED_HOST' in os.environ:
+    ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST')]
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -184,7 +187,7 @@ client_id = "church" # Client ID configured in the Auth Server
 if 'IS_PRODUCTION' in os.environ:
     public_uri = 'https://%s' % os.environ['ALLOWED_HOST']
 else:
-    public_uri = "http://localhost:8080/docs" 
+    public_uri = "http://localhost:8080"
 
 from bossoidc.settings import *
 configure_oidc(auth_uri, client_id, public_uri)

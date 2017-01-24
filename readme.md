@@ -41,5 +41,11 @@ $ `vagrant up`
   SSH into linux VM with this command:  
   `$ eb ssh`  
   Then manage django with this:  
-  `$ source /opt/python/current/env`  
-  `$ /opt/python/run/venv/bin/python3 /opt/python/current/app/manage.py <command>`
+  ```
+  $ sudo -s
+  $ source /opt/python/run/venv/bin/activate
+  $ source /opt/python/current/env
+  $ cd /opt/python/current/app
+  $ ./manage.py <command>
+  ```
+

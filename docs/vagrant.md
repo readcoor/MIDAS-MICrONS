@@ -38,7 +38,9 @@ $ `vagrant up`
   [Deploying Django on Beanstalk](http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html)  
   Configure your [API credentials](https://console.aws.amazon.com/iam/home#users)  
  `$ eb init`  
-  
+
+## Set up django environment on AWS using Elastic Beanstalk
+  `$ eb create -d -db -db.engine postgres -db.i db.t2.micro -p python-3.4 -r us-east-1 -k straz-cli microns-api-env`
 
 ## Manage django on AWS instance
   SSH into linux VM with this command:  

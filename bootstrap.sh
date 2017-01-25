@@ -6,9 +6,18 @@ ln -s /vagrant /home/vagrant/sync
 echo $'\nexport DJANGO_DEV=1' >> /home/vagrant/.bashrc
 echo $'\nexport PATH=/usr/pgsql-9.4/bin:$PATH' >> /home/vagrant/.bashrc
 
+#
+rm /etc/localtime
+ln -s /usr/share/zoneinfo/America/New_York /etc/localtime
+
 # sync clock
 chkconfig ntpd on
 ntpdate time.apple.com
+# systemctl disable chronyd
+# systemctl -a | grep ntp
+# systemctl status ntpd
+# systemctl start ntpd
+# systemctl start ntpdate
 
 # updates CentOS
 yum -y update

@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import socket
+
+
+LOCAL_IP = str(socket.gethostbyname(socket.gethostname()))
+
+print('local ip', LOCAL_IP)
 
 # os.environ['LD_LIBRARY_PATH'] = '/usr/local/lib'
 
@@ -34,7 +40,7 @@ else:
     DEBUG = True
 
 if 'ALLOWED_HOST' in os.environ:
-    ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST')]
+    ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOST'), LOCAL_IP]
 else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 

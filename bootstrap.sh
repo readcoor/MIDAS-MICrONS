@@ -18,6 +18,7 @@ ntpdate time.apple.com
 # systemctl status ntpd
 # systemctl start ntpd
 # systemctl start ntpdate
+# sudo pkill -9 -f ntp
 
 # updates CentOS
 yum -y update

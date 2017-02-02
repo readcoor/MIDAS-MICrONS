@@ -18,7 +18,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic import RedirectView, TemplateView
-from .views import schema_view, index, health_check
+from .views import schema_view, index, health_check, atlassian
 
 redirect_homepage_view = RedirectView.as_view(url='https://wyssmicrons.github.io/MIDAS-MICrONS/', permanent=True)
 favicon_view  = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
@@ -26,6 +26,7 @@ favicon_view  = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 urlpatterns = [
     url(r'^$', index),
     url(r'^favicon\.ico$', favicon_view),
+    url(r'^atlassian-domain-verification.html', atlassian),
     url(r'^admin', admin.site.urls),
     url(r'^health', health_check),
     url(r'^docs', schema_view),

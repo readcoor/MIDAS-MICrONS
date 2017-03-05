@@ -83,22 +83,6 @@ class TimeSeriesMixin:
                .filter(time=time) \
                .get()
 
-class Partition(models.Model):
-    """
-    Object for handling manual DDL for database partitioning
-    """
-    def __init__(self, *args, **kwargs):
-        cursor = connection.cursor()
-        f = open('../../sql/partition.sql')
-        response = cursor.execute(f.read())
-        f.close()
-
-    def delete(self):
-        cursor = connection.cursor()
-        f = open('../../sql/partition_delete.sql')
-        response = cursor.execute(f.read())
-        f.close()
-
 class Neuron(NameLookupMixin, CELIMixin, models.Model):
     """
     Object representing a Neuron

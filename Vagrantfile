@@ -25,8 +25,8 @@ Vagrant.configure(2) do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-  config.vm.synced_folder '.', '/home/vagrant/sync', disabled: true
-  config.vm.synced_folder '.', '/vagrant', disabled: false
+  config.vm.synced_folder '.', '/home/vagrant/sync', disabled: false
+  config.vm.synced_folder '.', '/vagrant', disabled: true
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
@@ -35,5 +35,10 @@ Vagrant.configure(2) do |config|
   config.vm.provision :shell, 
       path: "bootstrap.sh", 
       privileged: true
+
+  config.vm.provider "virtualbox" do |vb|
+    # Need to enable this to work around SSH bug
+    vb.gui = true
+  end
 
 end

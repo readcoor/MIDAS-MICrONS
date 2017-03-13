@@ -16,6 +16,10 @@ EXPERIMENT = 'Mouse42'
 CHANNEL = 'EM'
 ANN_CHANNEL = 'Algorithm1'
 
+# Skip for now because
+# 1. Depends on having a valid token in ../../theboss.cfg
+# 2. Cannot tear down test resources because theBoss doesn't actually remove them yet.
+@unittest.skip('cannot tear down cleanly')
 class TheBossTestCase(unittest.TestCase):
 
     @classmethod
@@ -38,7 +42,7 @@ class TheBossTestCase(unittest.TestCase):
         '''Remove items. Use reverse order due to dependencies.'''
         boss = cls.boss
         fixtures = cls.fixtures
-        for resource_name in ['ann_channel', 'channel', 'experiment', 'collection', 'coordframe']:
+        for resource_name in ['channel', 'ann_channel', 'experiment', 'collection', 'coordframe']:
             boss.delete_project(fixtures[resource_name])
         cls.assertNotIn(cls, COLLECTION, boss.list_collections())
         cls.assertNotIn(cls, COORD_FRAME, boss.list_coordinate_frames())

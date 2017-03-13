@@ -7,7 +7,7 @@ django-rest-swagger
 djangorestframework
 docutils
 gunicorn
-intern
+intern==0.9.3
 markdown
 numpy
 psycopg2

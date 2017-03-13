@@ -1,4 +1,4 @@
-from django.db import models, connection
+from django.db import models
 from .util import NameLookupMixin, ChoiceEnum
 from .samples import Experiment, Layer
 from django.contrib.gis.db import models as gis_models
@@ -94,31 +94,21 @@ class Neuron(NameLookupMixin, CELIMixin, models.Model):
     geometry = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False) # [Point(x,y,z)...]
     keypoint = gis_models.PointField(dim=3, srid=0, spatial_index=False) # Point(x,y,z)
 
-class Bin_Table_Dimension(models.Model):
+class Mesh3D_FullTile(models.Model):
     """
-    Defines a set of dimensions for a bin table.
-    The table will be automatically created on each insert.
-    """
-    x_size = models.IntegerField(blank=False, null=False)
-    y_size = models.IntegerField(blank=False, null=False)
-    z_size = models.IntegerField(blank=False, null=False)
-    x_bins = models.IntegerField(blank=False, null=False)
-    y_bins = models.IntegerField(blank=False, null=False)
-    z_bins = models.IntegerField(blank=False, null=False)
-
-class Bin_Table_Default(models.Model):
-    """
-    A table of box objects defined by (x-min y-min z-min, x-max, y-max, z-max)
+    A mesh of tile sized (2560, 2160, 50) rectangles
     """
     box = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False)
 
-class Neuron_To_Bin(models.Model):
+
+class Neuron_To_Mesh(models.Model):
     """
-    Join table that links Neurons to each bin that contains some of that neurons point data
+    Join table that links Neurons to the Mesh table for optimizing queries
     """
-    experiment = models.ForeignKey(Experiment, related_name='neuron_to_bin', on_delete=models.CASCADE)
-    neuron = models.ForeignKey(Neuron, related_name='neuron_to_bin', on_delete=models.CASCADE)    
-    bin_table = models.ForeignKey(Bin_Table_Default, related_name='neuron_to_bin')
+    experiment = models.ForeignKey(Experiment, related_name='neuron_to_mesh', on_delete=models.CASCADE)
+    neuron = models.ForeignKey(Neuron, related_name='neuron_to_mesh', on_delete=models.CASCADE)    
+    mesh3d_fulltile = models.ForeignKey(Mesh3D_FullTile, related_name='neuron_to_mesh')
+
 
 class Synapse(NameLookupMixin, CELIMixin, models.Model):
     """

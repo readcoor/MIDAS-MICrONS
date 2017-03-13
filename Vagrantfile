@@ -1,3 +1,4 @@
+
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -32,13 +33,8 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
 
-  config.vm.provision :shell, 
-      path: "bootstrap.sh", 
+  config.vm.provision :shell,
+      path: "bootstrap.sh",
       privileged: true
-
-  config.vm.provider "virtualbox" do |vb|
-    # Need to enable this to work around SSH bug
-    vb.gui = true
-  end
 
 end

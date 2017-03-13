@@ -38,3 +38,6 @@ bin_id	| neuron_id
 2		| 2
 
 ![example](https://github.com/WyssMICrONS/MIDAS-MICrONS/tree/master/django/nada/sql/microns_mesh.png)
+
+#H1 Testing
+See the sandbox.sql file for a series of statements that can be used to validate the schema and the intersection queries that make the bin tables work.

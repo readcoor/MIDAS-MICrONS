@@ -1,6 +1,6 @@
 from django.db import models
 from .util import NameLookupMixin, ChoiceEnum
-from .samples import Experiment, Layer
+from .samples import Experiment, Channel
 from django.contrib.gis.db import models as gis_models
 from rest_framework.response import Response
 from rest_framework import status
@@ -31,31 +31,31 @@ class Compartment(ChoiceEnum):
     apical = 4
     axon = 5
 
-class CELIMixin:
+class CECIMixin:
     """
-    Looks up an object (neuron or synapse) matching the given collection/experiment/layer/id
+    Looks up an object (neuron or synapse) matching the given collection/experiment/channel/id
     Returns None if none found.
     """
     
     @classmethod
-    def get_by_celi(cls, collection_name, experiment_name, layer_name, id):
+    def get_by_celi(cls, collection_name, experiment_name, channel_name, id):
         return cls.objects \
                .filter(experiment__collection__name=collection_name) \
                .filter(experiment__name=experiment_name) \
-               .filter(layer__name=layer_name) \
+               .filter(channel__name=channel_name) \
                .filter(name=id) \
                .first()
 
     @classmethod
-    def get_obj_or_400(cls, collection_name, experiment_name, layer_name, id):
+    def get_obj_or_400(cls, collection_name, experiment_name, channel_name, id):
         '''
         If obj is None, Raise HTTP 400 Bad Request error
         Similar to django.shortcuts.get_object_or_404
         '''
-        obj = cls.get_by_celi(collection_name, experiment_name, layer_name, id)
+        obj = cls.get_by_celi(collection_name, experiment_name, channel_name, id)
         if obj is None:
-            err_msg = "Not found: %s with collection=%s, experiment=%s, layer=%s, id=%s" % \
-                      (cls.__name__, collection_name, experiment_name, layer_name, id)
+            err_msg = "Not found: %s with collection=%s, experiment=%s, channel=%s, id=%s" % \
+                      (cls.__name__, collection_name, experiment_name, channel_name, id)
             return Response(err_msg, status.HTTP_400_BAD_REQUEST)
         return obj
 
@@ -83,13 +83,13 @@ class TimeSeriesMixin:
                .filter(time=time) \
                .get()
 
-class Neuron(NameLookupMixin, CELIMixin, models.Model):
+class Neuron(NameLookupMixin, CECIMixin, models.Model):
     """
     Object representing a Neuron
     """
     name = models.BigIntegerField(unique=True)
     experiment = models.ForeignKey(Experiment, related_name='neurons', on_delete=models.PROTECT) # Parent
-    layer = models.ForeignKey(Layer, related_name='neurons', on_delete=models.PROTECT) # Parent
+    channel = models.ForeignKey(Channel, related_name='neurons', on_delete=models.PROTECT) # Parent
     cell_type = models.IntegerField(choices=CellType.choices(), default=CellType.unknown.value)
     geometry = gis_models.MultiPointField(dim=3, srid=0, spatial_index=False) # [Point(x,y,z)...]
     keypoint = gis_models.PointField(dim=3, srid=0, spatial_index=False) # Point(x,y,z)
@@ -110,13 +110,13 @@ class Neuron_To_Mesh(models.Model):
     mesh3d_fulltile = models.ForeignKey(Mesh3D_FullTile, related_name='neuron_to_mesh')
 
 
-class Synapse(NameLookupMixin, CELIMixin, models.Model):
+class Synapse(NameLookupMixin, CECIMixin, models.Model):
     """
     Object representing a Synapse
     """
     name = models.BigIntegerField(unique=True)
     experiment = models.ForeignKey(Experiment, related_name='synapses', on_delete=models.PROTECT) # Parent
-    layer = models.ForeignKey(Layer, related_name='synapses', on_delete=models.PROTECT) # Parent
+    channel = models.ForeignKey(Channel, related_name='synapses', on_delete=models.PROTECT) # Parent
     neuron = models.ForeignKey(Neuron, related_name='synapses', on_delete=models.CASCADE,
                                blank=True, null=True)
     partner_neuron = models.ForeignKey(Neuron, related_name='partner_synapses', on_delete=models.CASCADE,

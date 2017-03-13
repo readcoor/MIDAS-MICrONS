@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -8,14 +9,23 @@ from nada.fixtures import is_empty, nuke_all, boss_setup, neurons_setup, \
 
 
 class NdaIcdTestCase(APITestCase):
+
+    TEST_USERNAME = 'testuser'
+    TEST_PASSWORD = '12345'
     
     @classmethod
     def setUpClass(cls):
         '''Initialized once, before any class tests are run'''
         cls.assertTrue(cls, is_empty(BOSS_CLASSES))
-        cls.assertTrue(cls, is_empty(BOSS_CLASSES))
+        user = User.objects.create(username=cls.TEST_USERNAME)
+        user.set_password(cls.TEST_PASSWORD)
+        user.save()
+        cls.testuser = user
         boss_setup()
         neurons_setup(**NEURONS_TEST_OPTIONS)
+
+    def setUp(self):
+        result = self.client.login(username=self.TEST_USERNAME, password=self.TEST_PASSWORD)
 
     def test_S1_is_synapse(self):
         for s_id in [12, 42, 99]: # random test values of actual synapses

@@ -1,6 +1,6 @@
 import random
 from . import boss
-from ..models import Neuron, Synapse, Layer, Polarity, CellType, Compartment, \
+from ..models import Neuron, Synapse, Channel, Polarity, CellType, Compartment, \
      NeuronStimulus, NeuronActivity
 from django.contrib.gis.geos import Point, MultiPoint
 
@@ -35,14 +35,14 @@ NEURONS_TEST_OPTIONS = { 'N_NEURONS' : 50,
 
 def neurons_setup(**options):
     '''Sets up some sample objects for testing and debugging'''
-    layer1 = Layer.get_by_name('layer1')  # neurons
-    layer2 = Layer.get_by_name('layer2')  # synapses
-    experiment1 = layer1.experiment
+    channel1 = Channel.get_by_name('channel1')  # neurons
+    channel2 = Channel.get_by_name('channel2')  # synapses
+    experiment1 = channel1.experiment
     neurons = []
     synapses = []
 
     for neuron_id in range(0, options['N_NEURONS']):
-        neuron = Neuron(name=neuron_id, layer=layer1, experiment=experiment1)
+        neuron = Neuron(name=neuron_id, channel=channel1, experiment=experiment1)
         neurons.append(neuron)
         center_y = random.randrange(2000)
         center_z = random.randrange(2000)
@@ -63,7 +63,7 @@ def neurons_setup(**options):
     assert(len(neurons) == options['N_NEURONS'])
     for synapse_id in range(0, options['N_SYNAPSES']):
         synapse = create_synapse(synapse_id, neurons, \
-                                 layer=layer2, experiment=experiment1, options=options)
+                                 channel=channel2, experiment=experiment1, options=options)
         synapses.append(synapse)
     assert(len(synapses) == options['N_SYNAPSES'])        
     match_synapses(synapses)
@@ -93,10 +93,10 @@ def match_synapses(synapses):
             synapses.remove(synapse)
             synapses.remove(partner)
 
-def create_synapse(synapse_id, neurons, layer, experiment, options):
+def create_synapse(synapse_id, neurons, channel, experiment, options):
     random_neuron = neurons[random.randrange(0, options['N_NEURONS'])]
     synapse = Synapse(name=synapse_id,
-                      layer=layer,
+                      channel=channel,
                       experiment=experiment,
                       neuron=random_neuron,
                       compartment=random.random())

@@ -18,7 +18,7 @@ from .util import NameLookupMixin
 from . import validators
 
 
-__all__ = ['Collection', 'Experiment', 'CoordinateFrame', 'Layer']
+__all__ = ['Collection', 'Experiment', 'CoordinateFrame', 'Channel']
 
 
 class Collection(NameLookupMixin, models.Model):
@@ -100,15 +100,14 @@ class CoordinateFrame(NameLookupMixin, models.Model):
 
 
 
-class Layer(NameLookupMixin, models.Model):
+class Channel(NameLookupMixin, models.Model):
     """
-    Object representing a channel or layer. For image datasets these are channels and for annotations datasets these
-    are layers.
+    Object representing a channel or layer. 
     """
-    name = models.CharField(max_length=255, verbose_name="Name of the Layer", validators=[validators.NameValidator()])
+    name = models.CharField(max_length=255, verbose_name="Name of the Channel", validators=[validators.NameValidator()])
     description = models.CharField(max_length=4096, blank=True)
 
-    experiment = models.ForeignKey(Experiment, related_name='layers', on_delete=models.PROTECT)
+    experiment = models.ForeignKey(Experiment, related_name='channels', on_delete=models.PROTECT)
     is_channel = models.BooleanField()
     base_resolution = models.IntegerField(default=0)
     default_time_step = models.IntegerField(default=0)

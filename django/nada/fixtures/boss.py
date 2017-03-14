@@ -1,6 +1,6 @@
-from ..models import Layer, Experiment, CoordinateFrame, Collection
+from ..models import Channel, Experiment, CoordinateFrame, Collection
 
-BOSS_CLASSES = [Layer, Experiment, CoordinateFrame, Collection]
+BOSS_CLASSES = [Channel, Experiment, CoordinateFrame, Collection]
 
 def boss_setup():
     '''Sets up some sample objects for testing and debugging'''
@@ -19,18 +19,18 @@ def boss_setup():
     experiment1.save()
     experiment2 = Experiment(name='experiment2', collection=collection1, coord_frame=coord1)
     experiment2.save()
-    layer_params = {'default_time_step':0, 'base_resolution':0, 'datatype':'uint64'}
-    layer1 = Layer(name='layer1', experiment=experiment1, is_channel=False, description="Neurons layer",  **layer_params)
-    layer2 = Layer(name='layer2', experiment=experiment1, is_channel=False, description="Synapses layer", **layer_params)
-    layer3 = Layer(name='layer3', experiment=experiment1, is_channel=False, **layer_params)
-    layer4 = Layer(name='layer4', experiment=experiment2, is_channel=False, **layer_params)
-    layer5 = Layer(name='layer5', experiment=experiment2, is_channel=False, **layer_params)
-    layer6 = Layer(name='layer6', experiment=experiment2, is_channel=False, **layer_params)
-    channelA = Layer(name='channelA', experiment=experiment1, is_channel=True, **layer_params)
-    channelB = Layer(name='channelB', experiment=experiment1, is_channel=True, **layer_params)
-    channelC = Layer(name='channelC', experiment=experiment2, is_channel=True, **layer_params)
-    channelD = Layer(name='channelD', experiment=experiment2, is_channel=True, **layer_params)
-    for obj in [layer1, layer2, layer3, layer4, layer5, layer6,
+    channel_params = {'default_time_step':0, 'base_resolution':0, 'datatype':'uint64'}
+    channel1 = Channel(name='channel1', experiment=experiment1, is_channel=False, description="Neurons channel",  **channel_params)
+    channel2 = Channel(name='channel2', experiment=experiment1, is_channel=False, description="Synapses channel", **channel_params)
+    channel3 = Channel(name='channel3', experiment=experiment1, is_channel=False, **channel_params)
+    channel4 = Channel(name='channel4', experiment=experiment2, is_channel=False, **channel_params)
+    channel5 = Channel(name='channel5', experiment=experiment2, is_channel=False, **channel_params)
+    channel6 = Channel(name='channel6', experiment=experiment2, is_channel=False, **channel_params)
+    channelA = Channel(name='channelA', experiment=experiment1, is_channel=True, **channel_params)
+    channelB = Channel(name='channelB', experiment=experiment1, is_channel=True, **channel_params)
+    channelC = Channel(name='channelC', experiment=experiment2, is_channel=True, **channel_params)
+    channelD = Channel(name='channelD', experiment=experiment2, is_channel=True, **channel_params)
+    for obj in [channel1, channel2, channel3, channel4, channel5, channel6,
                 channelA, channelB, channelC, channelD]:
         obj.save()
 

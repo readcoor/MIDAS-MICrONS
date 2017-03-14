@@ -19,7 +19,7 @@ class FixturesTestCase(APITestCase):
         for (cls, count) in [(nada.models.Collection, 1),
                              (nada.models.CoordinateFrame, 1),
                              (nada.models.Experiment, 2),
-                             (nada.models.Layer, 10),
+                             (nada.models.Channel, 10),
                              (nada.models.Neuron, NEURONS_TEST_OPTIONS['N_NEURONS']),
                              (nada.models.Synapse, NEURONS_TEST_OPTIONS['N_SYNAPSES'])
                              ]:
@@ -29,16 +29,16 @@ class FixturesTestCase(APITestCase):
     def test_neuron_connections(self):
         for neuron in nada.models.Neuron.objects.all():
             self.assertIsNotNone(neuron.experiment)
-            self.assertIsNotNone(neuron.layer)
-            self.assertEquals(neuron.layer.name, 'layer1')
+            self.assertIsNotNone(neuron.channel)
+            self.assertEquals(neuron.channel.name, 'channel1')
 
     def test_synapse_connections(self):
         for synapse in nada.models.Synapse.objects.all():
             self.assertIsNotNone(synapse.experiment)
-            self.assertIsNotNone(synapse.layer)
+            self.assertIsNotNone(synapse.channel)
             self.assertIsNotNone(synapse.neuron)
             self.assertIsNotNone(synapse.partner_synapse)
-            self.assertEquals(synapse.layer.name, 'layer2')
+            self.assertEquals(synapse.channel.name, 'channel2')
             self.assertIn(synapse, synapse.neuron.synapses.all())
             self.assertEquals(synapse, synapse.partner_synapse.partner_synapse)
             self.assertEquals(synapse.neuron, synapse.partner_synapse.partner_neuron)

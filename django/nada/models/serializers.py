@@ -15,10 +15,10 @@
 
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
-from . import Collection, Experiment, Layer, CoordinateFrame
+from . import Collection, Experiment, Channel, CoordinateFrame
 
 __all__ = [ 'CollectionSerializer', 'ExperimentSerializer', 
-            'CoordinateFrameSerializer', 'LayerSerializer' ]
+            'CoordinateFrameSerializer', 'ChannelSerializer' ]
 
 class CollectionSerializer(serializers.ModelSerializer):
     #experiments = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='experiment-detail')
@@ -28,12 +28,12 @@ class CollectionSerializer(serializers.ModelSerializer):
         #fields = ('id', 'name', 'description', 'experiments')
 
 class ExperimentSerializer(serializers.ModelSerializer):
-    #layers = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='layer-detail')
+    #channels = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='channel-detail')
 
     class Meta:
         model = Experiment
         #fields = ('id', 'name', 'description', 'collection', 'coord_frame', 'num_hierarchy_levels', 'hierarchy_method',
-        #          'max_time_sample', 'layers')
+        #          'max_time_sample', 'channels')
         #extra_kwargs = {'collection': {'lookup_field': 'name', 'lookup_url_kwarg':'collection'},
         #                'coord_frame': {'lookup_field': 'name', 'lookup_url_kwarg':'coord_frame'}}
 
@@ -44,9 +44,9 @@ class CoordinateFrameSerializer(serializers.ModelSerializer):
         #fields = ('id', 'name', 'description', 'x_start', 'x_stop', 'y_start', 'y_stop', 'z_start', 'z_stop',
         #          'x_voxel_size', 'y_voxel_size', 'z_voxel_size', 'voxel_unit', 'time_step', 'time_step_unit')
 
-class LayerSerializer(serializers.ModelSerializer):
+class ChannelSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Layer
+        model = Channel
         #fields = ('id', 'name', 'description', 'is_channel', 'experiment', 'default_time_step',
         #          'base_resolution', 'datatype')

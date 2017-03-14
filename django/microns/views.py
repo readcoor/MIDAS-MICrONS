@@ -4,12 +4,16 @@ from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 
 from django.db import connection
 from django.http import HttpResponse, HttpResponseServerError
+from django.template.response import SimpleTemplateResponse
 from nada.models import Neuron, Synapse
-
 
 @api_view()
 @renderer_classes([OpenAPIRenderer, SwaggerUIRenderer])
 def schema_view(request):
+    """
+    Use Swagger's schema generator to automatically render API viewer pages,
+    All under http://<host>/docs/*
+    """
     generator = schemas.SchemaGenerator(title='Wyss MICrONS API')
     full_schema = generator.get_schema(request=request)
     uri = request._request.get_raw_uri()
@@ -18,10 +22,16 @@ def schema_view(request):
 
 
 def index(request):
-    return HttpResponse('<p>Hello, world.</P> <P>View the API <a href="/docs">here</a></P>')
+    '''
+    Render home page (http://<host>/)
+    '''
+    return SimpleTemplateResponse('index.html')
 
 def health_check(request):
-    '''Return 200 to tell Elastic Beanstalk that everything is ok'''
+    '''
+    Render health check (http://<host>/health)
+    Return 200 to tell Elastic Beanstalk that everything is ok
+    '''
     try: 
         check_table_exists(Neuron)
         check_table_exists(Synapse)
@@ -30,6 +40,9 @@ def health_check(request):
         return HttpResponseServerError(err)
 
 def check_table_exists(model_class):
+    '''
+    Raises an error if table does not exist.
+    '''
     table_name = model_class._meta.db_table
     with connection.cursor() as cursor:
         q = 'SELECT * FROM information_schema.tables WHERE table_name = %s'

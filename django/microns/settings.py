@@ -13,8 +13,12 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 import socket
 
+try:
+    HOSTNAME = socket.gethostname()
+except:
+    HOSTNAME = 'localhost'
 
-LOCAL_IP = str(socket.gethostbyname(socket.gethostname()))
+LOCAL_IP = str(socket.gethostbyname(HOSTNAME))
 
 print('local ip', LOCAL_IP)
 

@@ -2,14 +2,16 @@
 layout: default
 ---
 
-# NDA API demo readme
+# MIDAS API demo readme
 
 
-This document describes how to demo the abilities of the NDA API using the dummy data on the demo site. 
+This document describes how to demo the abilities of the MIDAS API using the dummy data on the demo site. 
 
 ## Demo site:
-To find REST parameter documentation for all NDA API endpoints, visit this page:  
+To find REST parameter documentation for all MIDAS API endpoints, visit this page:  
 [`http://microns-api.readcoor.com/docs/`](http://microns-api.readcoor.com/docs/)
+
+You may need to [log in](https://microns-api.readcoor.com/openid/openid/KeyCloak?next=/docs) first, using theBoss single sign-on (SSO).
 
 ## Example values:
 This section describes the ranges of example values used to populate the demo site. 
@@ -26,7 +28,6 @@ This section describes the ranges of example values used to populate the demo si
 |  neuron keypoint’s y or z-coordinate | 0-2000 (randomized)   |
 |synapse keypoint’s x-coordinate | 0-1000 (assigned to be same as synapse ID) |
 |synapse keypoint’s y or z-coordinate | 0-2000 (randomized) |
-{: .table .table-striped}
 
 ## API Examples you can try:
 This sections gives specific examples of API URLs you can try on the demo site, using dummy data in both the request parameters and the responses.

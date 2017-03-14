@@ -4,7 +4,7 @@ from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 
 from django.db import connection
 from django.http import HttpResponse, HttpResponseServerError
-from django.template.response import SimpleTemplateResponse
+from django.shortcuts import render
 from nada.models import Neuron, Synapse
 
 @api_view()
@@ -25,7 +25,7 @@ def index(request):
     '''
     Render home page (http://<host>/)
     '''
-    return SimpleTemplateResponse('index.html')
+    return render(request, 'index.html', {'HOSTNAME': request.get_host()})
 
 def health_check(request):
     '''
